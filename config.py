@@ -8,7 +8,7 @@ DEBUG = True
 
 # Secret key for session management. You can generate random strings here:
 # https://randomkeygen.com/
-SECRET_KEY = 'my precious'
+SECRET_KEY = 'secret-key-goes-here'
 
 # Connect to the database
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'database.db')
+SQLALCHEMY_DATABASE_URI = "postgresql://postgres:1@localhost:5432/watch"

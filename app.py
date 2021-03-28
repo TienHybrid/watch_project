@@ -1,27 +1,63 @@
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 # Imports
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 
-from flask import Flask, render_template, request
-# from flask.ext.sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
-from forms import *
-import os
 
-#----------------------------------------------------------------------------#
+from flask import Flask
+from flask_login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
+
+from controllers.admin import admin, authentication, product_management, user_management, category_management,staff_management
+from controllers.client import main, product, cart
+from models import Staff
+
+
+# ----------------------------------------------------------------------------#
 # App Config.
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 
-app = Flask(__name__)
-app.config.from_object('config')
-#db = SQLAlchemy(app)
 
+def create_app():
+    my_app = Flask(__name__)
+    my_app.config.from_object('config')
+    my_app.register_blueprint(main.mod)
+    my_app.register_blueprint(cart.mod)
+    my_app.register_blueprint(product.mod)
+    my_app.register_blueprint(admin.mod)
+    my_app.register_blueprint(product_management.mod)
+    my_app.register_blueprint(staff_management.mod)
+    my_app.register_blueprint(category_management.mod)
+    my_app.register_blueprint(user_management.mod)
+    my_app.register_blueprint(authentication.mod)
+    # init database
+    db = SQLAlchemy(my_app)
+    db.init_app(my_app)
+    # init login system
+    login_manager = LoginManager()
+    login_manager.login_view = 'authentication.login'
+    login_manager.init_app(my_app)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        # since the user_id is just the primary key of our user table, use it in the query for the user
+        return db.session.query(Staff).filter(Staff.id == int(user_id)).first()
+
+    return my_app
+
+
+app = create_app()
+#
+# @app.route('/')
+# def main():
+#     category = db.session.query(Category).all()
+#     return render_template('client.html', category=category)
 # Automatically tear down SQLAlchemy.
 '''
 @app.teardown_request
 def shutdown_session(exception=None):
-    db_session.remove()
+    db.remove()
 '''
 
 # Login required decorator.
@@ -36,50 +72,10 @@ def login_required(test):
             return redirect(url_for('login'))
     return wrap
 '''
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 # Controllers.
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 
-
-@app.route('/')
-def home():
-    return render_template('pages/placeholder.home.html')
-
-
-@app.route('/about')
-def about():
-    return render_template('pages/placeholder.about.html')
-
-
-@app.route('/login')
-def login():
-    form = LoginForm(request.form)
-    return render_template('forms/login.html', form=form)
-
-
-@app.route('/register')
-def register():
-    form = RegisterForm(request.form)
-    return render_template('forms/register.html', form=form)
-
-
-@app.route('/forgot')
-def forgot():
-    form = ForgotForm(request.form)
-    return render_template('forms/forgot.html', form=form)
-
-# Error handlers.
-
-
-@app.errorhandler(500)
-def internal_error(error):
-    #db_session.rollback()
-    return render_template('errors/500.html'), 500
-
-
-@app.errorhandler(404)
-def not_found_error(error):
-    return render_template('errors/404.html'), 404
 
 if not app.debug:
     file_handler = FileHandler('error.log')
@@ -91,9 +87,9 @@ if not app.debug:
     app.logger.addHandler(file_handler)
     app.logger.info('errors')
 
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 # Launch.
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 
 # Default port:
 if __name__ == '__main__':
