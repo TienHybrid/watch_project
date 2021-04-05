@@ -6,12 +6,12 @@ import logging
 from logging import Formatter, FileHandler
 
 from flask import Flask
-from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
-from controllers.admin import admin, authentication, product_management, user_management, category_management,staff_management
+from controllers.admin import admin, authentication, product_management, user_management, category_management, \
+    staff_management
 from controllers.client import main, product, cart
-from models import Staff
+from libs.constant import none_to_empty_string
 
 
 # ----------------------------------------------------------------------------#
@@ -34,21 +34,18 @@ def create_app():
     # init database
     db = SQLAlchemy(my_app)
     db.init_app(my_app)
-    # init login system
-    login_manager = LoginManager()
-    login_manager.login_view = 'authentication.login'
-    login_manager.init_app(my_app)
-
-    @login_manager.user_loader
-    def load_user(user_id):
-        # since the user_id is just the primary key of our user table, use it in the query for the user
-        return db.session.query(Staff).filter(Staff.id == int(user_id)).first()
-
     return my_app
 
 
 app = create_app()
-#
+app.jinja_env.globals.update(none_to_empty_string=none_to_empty_string)
+
+
+@app.context_processor
+def inject_stage_and_region():
+    return dict(stage="alpha", region="NA")
+
+
 # @app.route('/')
 # def main():
 #     category = db.session.query(Category).all()

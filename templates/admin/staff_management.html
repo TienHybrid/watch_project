@@ -12,9 +12,9 @@
                     <h6 class="h2 text-white d-inline-block mb-0">Tables</h6>
                     <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
                         <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
-                            <li class="breadcrumb-item"><a href="#">Tables</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Tables</li>
+                            <li class="breadcrumb-item"><a href="{{url_for('admin.admin')}}"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="{{url_for('admin.admin')}}">Admin</a></li>
+                            <li class="breadcrumb-item active">Nhân viên</li>
                         </ol>
                     </nav>
                 </div>
@@ -43,6 +43,7 @@
                         <thead class="thead-light">
                         <tr>
                             <th scope="col" class="sort" data-sort="username">Tài Khoản</th>
+                            <th scope="col" class="sort" data-sort="fullname">Họ Tên</th>
                             <th scope="col" class="sort" data-sort="email">Email</th>
                             <th scope="col" class="sort" data-sort="address">Địa Chỉ</th>
                             <th scope="col">Số Điện Thoại</th>
@@ -62,6 +63,9 @@
                                     </div>
                                 </div>
                             </th>
+                             <td class="budget">
+                                {{staff.fullname}}
+                            </td>
                             <td class="budget">
                                 {{staff.email}}
                             </td>
@@ -80,8 +84,7 @@
                                     <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
                                         <a class="dropdown-item"
                                            href="{{url_for('staff_management.staff_detail', id_staff = staff.id)}}">Sửa</a>
-                                        <a class="dropdown-item"
-                                           href="{{url_for('staff_management.delete_staff_detail', id_staff = staff.id)}}">Xóa</a>
+                                        <a class="dropdown-item"  id="{{staff.id}}" onclick="deleteStaff(this)">Xóa</a>
                                     </div>
                                 </div>
                             </td>
@@ -113,12 +116,12 @@
                                 <a class="page-link" href="#">{{page_num}}</a>
                             </li>
                             {% else %}
-                            <li class="page-item"><a class="page-link" href="#">{{page_num}}</a></li>
+                            <li class="page-item"><a class="page-link" href="{{url_for('staff_management.staff_management',page=page_num)}}">{{page_num}}</a></li>
                             {%endif%}
                             {%endif%}
                             {% endfor %}
-                            <li class="page-item {% if staffs.page == 1 %}disabled{% endif %}">
-                                <a class="page-link"
+                            <li class="page-item">
+                                <a class="page-link {% if not staffs.next_num %}disabled{% endif %}"
                                    href="{{url_for('staff_management.staff_management',page=staffs.next_num)}}">
                                     <i class="fas fa-angle-right"></i>
                                     <span class="sr-only">Next</span>
@@ -130,11 +133,41 @@
             </div>
         </div>
     </div>
+<script type="text/javascript">
+      function deleteStaff(obj){
+      console.log(obj)
+        let idStaff = obj.id;
+        swal({
+          title: "Are you sure?",
+          text: "Once deleted, you will not be able to restore this object!",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+            $.ajax({
+                type: "POST",
+                url: "/admin/staff_management/delete/"+idStaff,
+                success: function (data) {
+                    swal(data, {
+                      icon: "success",
+                    }).then(()=>{
+                        location.reload()
+                    });
+                },
+                error: function (e) {
+                    swal(e.responseText);
+                }
+            });
+          } else {
+          }
+        });
+    }
+</script>
 
 
 </div>
-
 {% endblock content %}
 
-<!-- Specific JS goes HERE -->
-{% block javascripts %}{% endblock javascripts %}
+

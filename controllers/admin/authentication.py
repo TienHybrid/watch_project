@@ -1,10 +1,10 @@
-from flask import Blueprint, render_template, request, redirect, url_for, current_app
-from flask_login import login_user
+from flask import Blueprint, render_template, request, redirect, url_for, session, current_app
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_required, current_user, logout_user
 from models import Staff
 from templates.admin.forms import LoginForm, CreateAccountForm
+from libs.user_permission import get_admin_type_in_session, admin_required
+from libs.constant import UserTypeEnum
 
 mod = Blueprint(name='authentication', import_name="__name__", url_prefix='/admin', static_folder='static/admin/assets',
                 template_folder='templates/admin')
@@ -12,27 +12,37 @@ db = SQLAlchemy()
 
 
 ## Login & Registration
-
+@mod.route('/')
 @mod.route('/login', methods=['GET', 'POST'])
 def login():
+    """Return welcome page for non-login user
+           Step 1: Check user login, if login -> redirect to question list page
+           Step 2: Compare email, password with DB object
+       """
+    user_type = get_admin_type_in_session()
     login_form = LoginForm(request.form)
+    current_app.logger.info(f'user_type{user_type}')
+    if user_type != UserTypeEnum.NOT_LOGIN:
+        return redirect(url_for('admin.admin'))
+
     if 'login' in request.form:
         # read form data
         username = request.form.get('username')
         password = request.form.get('password')
         remember = True if request.form.get('remember') else False
-
-        # Locate user
         staff_checked = db.session.query(Staff).filter(Staff.username == username).first()
-
         if not staff_checked or not check_password_hash(staff_checked.password, password):
-            current_app.logger.info(f'{staff_checked}')
-            return render_template('accounts/login.html', msg='Không Có User hoặc mật khẩu sai, vui lòng kiểm tra',
+            return render_template('accounts/login.html', msg='Không Có Tài Khoản hoặc mật khẩu sai, vui lòng kiểm tra',
                                    form=login_form)
         else:
-            login_user(staff_checked, remember=remember)
+            session['admin'] = username
+            session['admin_type'] = UserTypeEnum.ADMIN_LOGIN
+            session['admin_id'] = staff_checked.id
+            session['remember'] = remember
+            session['admin_avatar'] = staff_checked.avatar_url if staff_checked.avatar_url else ''
             return redirect(url_for('admin.admin'))
-    return render_template('accounts/login.html', form=login_form)
+    return render_template('accounts/login.html',
+                           form=login_form)
 
 
 @mod.route('/register', methods=['GET', 'POST'])
@@ -72,16 +82,18 @@ def register():
 
 
 @mod.route('/logout')
-@login_required
+@admin_required
 def logout():
-    logout_user()
+    session.pop('admin', None)
+    session.pop('admin_id', None)
+    session.pop('admin_type', None)
     return redirect(url_for('authentication.login'))
 
 
 @mod.route('/profile')
-@login_required
+@admin_required
 def profile():
-    return render_template('profile.html', current_user=current_user)
+    return render_template('profile.html', current_user={})
 
 
 @mod.errorhandler(403)

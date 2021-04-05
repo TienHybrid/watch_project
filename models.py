@@ -1,5 +1,4 @@
 # coding: utf-8
-from flask_login import UserMixin
 from sqlalchemy import ARRAY, Boolean, Column, DateTime, ForeignKey, Integer, String, VARCHAR
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -16,11 +15,12 @@ metadata = Base.metadata
 Base.query = db_session.query_property()
 
 
-class User(UserMixin, Base):
+class User( Base):
     __tablename__ = 'User'
 
     id = Column(Integer, primary_key=True, server_default=FetchedValue())
     username = Column(String(60), nullable=False)
+    fullname = Column(String(60), nullable=True)
     email = Column(String(255), nullable=False)
     password = Column(String(255), nullable=False)
     address = Column(String)
@@ -60,11 +60,12 @@ class Product(Base):
     category = relationship('Category', primaryjoin='Product.category_id == Category.id', backref='products')
 
 
-class Staff(UserMixin, Base):
+class Staff( Base):
     __tablename__ = 'staff'
 
     id = Column(Integer, primary_key=True, server_default=FetchedValue())
     username = Column(String(60), nullable=False)
+    fullname = Column(String(60), nullable=True)
     email = Column(String(255), nullable=False)
     password = Column(String(255), nullable=False)
     address = Column(String)
