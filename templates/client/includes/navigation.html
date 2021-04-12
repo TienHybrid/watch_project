@@ -44,9 +44,22 @@
                                     </li>
                                 </ul>
                             </div>
-                            <div class="header-right-side-menu ml-15">
-                                <a href="#" id="sideMenuBtn"><i class="ti-menu" aria-hidden="true"></i></a>
+                            <!-- Example split danger button -->
+                            {% if session['user_id']%}
+                            <div class="btn-group ml-2">
+                              <button type="button" class="btn dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  <img src={{session['user_avatar']}} width="40" height="40"/>
+                                  <span>{{session['user']}}</span>
+                                <span class="sr-only">Toggle Dropdown</span>
+                              </button>
+                              <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{{url_for('main.profile')}}">Profile</a>
+                                  <a class="dropdown-item" href="{{url_for('cart.cart')}}">Đơn Hàng</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{{url_for('authentication_client.logout')}}">Đăng Xuất</a>
+                              </div>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -120,32 +133,17 @@
                         </nav>
                     </div>
                     <!-- Help Line -->
+                    {% if not session['user_id'] %}
                     <div class="help-line">
-                        <a href="#"><i class="ti-headphone-alt"></i> Đăng Nhập</a>
+                        <a href="{{url_for('authentication_client.login')}}"><i class="ti-headphone-alt"></i> Đăng Nhập</a>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </header>
-<!-- ****** Top Discount Area Start ****** -->
-<section class="top-discount-area d-md-flex align-items-center">
-    <!-- Single Discount Area -->
-    <div class="single-discount-area">
-        <h5>Free Shipping &amp; Returns</h5>
-        <h6><a href="#">BUY NOW</a></h6>
-    </div>
-    <!-- Single Discount Area -->
-    <div class="single-discount-area">
-        <h5>20% Discount for all dresses</h5>
-        <h6>USE CODE: Colorlib</h6>
-    </div>
-    <!-- Single Discount Area -->
-    <div class="single-discount-area">
-        <h5>20% Discount for students</h5>
-        <h6>USE CODE: Colorlib</h6>
-    </div>
-</section>
+
 <!-- ****** Top Discount Area End ****** -->
 
 <!-- ****** Header Area End ****** -->

@@ -3,110 +3,277 @@
 {% block title %} Profile {% endblock title %}
 
 {% block content %}
+<style>
+div.gallery {
+  margin: 5px;
+  border: 1px solid #ccc;
+  float: left;
+  width: 200px;
+}
 
+div.gallery:hover {
+  border: 1px solid #777;
+}
+
+div.gallery img {
+      width: 100%;
+    height: 200px;
+    object-fit: contain;
+}
+
+div.desc {
+  padding: 15px;
+  text-align: center;
+}
+
+
+
+
+</style>
 <div class="header pb-6 d-flex align-items-center"
      style="min-height: 100px; background-image: url(/static/assets/img/theme/profile-cover.jpg); background-size: cover; background-position: center top;">
-  <!-- Mask -->
-  <span class="mask bg-gradient-default opacity-8"></span>
+    <!-- Mask -->
+    <span class="mask bg-gradient-default opacity-8"></span>
 
 </div>
 <!-- Page content -->
 <div class="container-fluid mt--6">
-  <div class="row">
-    <div class="col-xl-12 order-xl-1">
-      <div class="card">
-        <div class="card-header">
-          <div class="row align-items-center">
-            <div class="col-8">
-              <h3 class="mb-0">Edit profile </h3>
+
+    <div class="row">
+        <div class="col-xl-12 order-xl-1">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h3 class="mb-0">{{ title }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <form method="post" onsubmit="return submitFormData()" enctype="multipart/form-data">
+                    <h6 class="heading-small text-muted mb-4 pl-3">Thông Tin Chung</h6>
+                    <div class="pl-lg-4">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-name">Name</label>
+                                    <input type="text" id="input-name" class="form-control"
+                                           onchange="convertToSlug(this.value)"
+                                           placeholder="Username" value="{{product.name}}"
+                                    >
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-slug">Slug</label>
+                                    <input type="text" id="input-slug" class="form-control"
+                                           disabled
+                                           placeholder="slug..." value="{{product.slug}}"
+                                    >
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <label class="form-control-label" for="input-quantity">Quantity</label>
+
+                                <div class="form-group">
+                                    <div id="image-group"></div>
+                                    <div id="image-preview-group"></div>
+                                    <input type="file" class="btn btn-sm btn-primary" id="preview-files"
+                                           onchange="addPreviewFile(this)"
+                                           {% if not product %} required {%endif %} >
+                                </div>
+
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-quantity">Quantity</label>
+                                    <input type="text" id="input-quantity" class="form-control"
+                                           placeholder="Họ Tên" value="{{none_to_empty_string(product.quantity)}}">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-price">Price </label>
+                                    <input type="text" id="input-price" class="form-control" placeholder=""
+                                           value="{{product.price}}"
+                                    >
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label for="input-category">Category</label>
+                                    <select class="form-control" id="input-category">
+                                        {% for category in categories %}
+                                        <option
+                                                value="{{category.id}}"
+                                                {% if category.id== product.category_id%} selected="selected" {% endif
+                                                %}>
+                                            {{category.name}}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="d-flex justify-content-center">
+                            <a class="btn btn-sm " href="{{url_for('product_management.product_management')}}">Hủy
+                                Bỏ</a>
+                            <button class="btn btn-sm btn-primary" type="submit">Save</button>
+                        </div>
+                </form>
             </div>
-            <div class="col-4 text-right">
-              <a href="#!" class="btn btn-sm btn-primary">Settings</a>
-            </div>
-          </div>
+
         </div>
-        <div class="card-body">
-          <form>
-            <h6 class="heading-small text-muted mb-4">User information</h6>
-            <div class="pl-lg-4">
-              <div class="row">
-                <div class="col-lg-6">
-                  <div class="form-group">
-                    <label class="form-control-label" for="input-username">Username</label>
-                    <input type="text" id="input-username" class="form-control" placeholder="Username" value="{{ current_user.username }}">
-                  </div>
-                </div>
-                <div class="col-lg-6">
-                  <div class="form-group">
-                    <label class="form-control-label" for="input-email">Email address</label>
-                    <input type="email" id="input-email" class="form-control" placeholder="{{ current_user.email }}">
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-6">
-                  <div class="form-group">
-                    <label class="form-control-label" for="input-first-name">First name</label>
-                    <input type="text" id="input-first-name" class="form-control" placeholder="First name" value="Lucky">
-                  </div>
-                </div>
-                <div class="col-lg-6">
-                  <div class="form-group">
-                    <label class="form-control-label" for="input-last-name">Last name</label>
-                    <input type="text" id="input-last-name" class="form-control" placeholder="Last name" value="Jesse">
-                  </div>
-                </div>
-              </div>
-            </div>
-            <hr class="my-4" />
-            <!-- Address -->
-            <h6 class="heading-small text-muted mb-4">Contact information</h6>
-            <div class="pl-lg-4">
-              <div class="row">
-                <div class="col-md-12">
-                  <div class="form-group">
-                    <label class="form-control-label" for="input-address">Address</label>
-                    <input id="input-address" class="form-control" placeholder="Home Address" value="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09" type="text">
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-4">
-                  <div class="form-group">
-                    <label class="form-control-label" for="input-city">City</label>
-                    <input type="text" id="input-city" class="form-control" placeholder="City" value="New York">
-                  </div>
-                </div>
-                <div class="col-lg-4">
-                  <div class="form-group">
-                    <label class="form-control-label" for="input-country">Country</label>
-                    <input type="text" id="input-country" class="form-control" placeholder="Country" value="United States">
-                  </div>
-                </div>
-                <div class="col-lg-4">
-                  <div class="form-group">
-                    <label class="form-control-label" for="input-country">Postal code</label>
-                    <input type="number" id="input-postal-code" class="form-control" placeholder="Postal code">
-                  </div>
-                </div>
-              </div>
-            </div>
-            <hr class="my-4" />
-            <!-- Description -->
-            <h6 class="heading-small text-muted mb-4">About me</h6>
-            <div class="pl-lg-4">
-              <div class="form-group">
-                <label class="form-control-label">About Me</label>
-                <textarea rows="4" class="form-control" placeholder="A few words about you ...">A beautiful Dashboard for Bootstrap 4. It is Free and Open Source.</textarea>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
-  </div>
+</div>
+
+<script type="text/javascript">
+    // get image url from product
+    let urls = {{product.image_url |safe }} {% if not product %} [] {% endif%}
+    let previewFiles = []
+    function getImageUrl(url_selected) {
+        const avatarGroup = document.getElementById('image-group');
+        if(!urls) return
+        else {
+            url = url_selected.map((item,index) => {
+                return `<div class="gallery" id="image_${index}">
+                                        <a>
+                                            <img src=${item} alt="Cinque Terre">
+                                        </a>
+                                        <div class="desc">
+                                            <a class="btn btn-md" onclick="deleteImage(${index})">
+                                                <i class="fa fa-trash" style="color:red;" aria-hidden="true"></i>
+                                            </a>
+                                        </div>
+                                    </div>`
+            })
+            avatarGroup.innerHTML = url.join("");
+        }
+    }
+    function deleteImage(index){
+        const data = document.getElementById(`image_${index}`);
+        data.remove();
+        urls.splice(index, 1);
+        getImageUrl(urls)
+     }
+    getImageUrl(urls)
+   //add preview image url files
 
 
+    //Check File API support
+    function addPreviewFile(input){
+        if(window.File && window.FileList && window.FileReader)
+        {
+            if (input.files && input.files[0]) {
+                previewFiles.push({id:previewFiles.length === 0 ? 0 : previewFiles[previewFiles.length-1].id +1, file:input.files[0]});
+            }
+        }
+        getPreviewFiles(previewFiles)
+    }
+    function getPreviewFiles(selectedFiles){
+        let output = document.getElementById("image-preview-group");
+        output.innerHTML = ''
+        let mapping = selectedFiles.filter(item => {
+            let file = item.file
+                var picReader = new FileReader();
+
+                picReader.addEventListener("load",function(event){
+
+                    var picFile = event.target;
+
+                    var div = document.createElement("div");
+
+                    div.innerHTML = `<div class="gallery" id="image_preview_${item.id}">
+                                        <a>
+                                            <img src=${picFile.result} alt="Cinque Terre">
+                                        </a>
+                                        <div class="desc">
+                                            <a class="btn btn-md" onclick="deletePreviewImage(${item.id})">
+                                                <i class="fa fa-trash" style="color:red;" aria-hidden="true"></i>
+                                            </a>
+                                        </div>
+                                    </div>`
+                    output.insertBefore(div,null);
+                });
+            picReader.readAsDataURL(file);
+        })
+    }
+    function deletePreviewImage(index) {
+        previewFiles = previewFiles.filter(item => item.id !== index)
+        getPreviewFiles(previewFiles)
+    }
+
+    function submitFormData(){
+        swal({
+          title: "Are you sure?",
+          text: "Kiểm Tra Thông Tin Trước khi gửi",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+            var formData = new FormData();
+            const name = document.getElementById("input-name").value;
+            const price = document.getElementById("input-price").value;
+            const quantity = document.getElementById("input-quantity").value;
+            const slug = document.getElementById("input-slug").value;
+            const category = document.getElementById("input-category").value
+            formData.append("name", name);
+            formData.append("price", price);
+            formData.append("quantity", quantity);
+            formData.append("slug", slug);
+            formData.append("category_id", category);
+            if (urls.length > 0) {
+                formData.append("image_url", JSON.stringify(urls));
+            }
+            if (previewFiles.length > 0) {
+                previewFiles.forEach(item => {
+                    formData.append("files", item.file)
+                })
+            }
+            $.ajax({
+                type: "POST",
+                url: "{{url_for('product_management.product_detail', id_product = id_product)}}",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    let objData = JSON.parse(data);
+                    let idProduct = parseInt(objData.id_product);
+                    if(idProduct){
+                        window.location= "/admin/product_management/"+idProduct;
+                    }
+                    else{
+                        swal(objData.message, {
+                          icon: "warning",
+                        });
+                    }
+                },
+                error: function (e) {
+                    document.body.innerHTML = e.responseText
+                }
+            });
+            return false;
+          } else {
+            return false;
+          }
+        });
+        return false;
+    }
+    function convertToSlug(Text)
+    {
+        const slug = document.getElementById("input-slug")
+        if (!Text) slug.value = ''
+        else slug.value =  Text.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'');
+    }
+
+
+
+
+
+</script>
 </div>
 
 {% endblock content %}

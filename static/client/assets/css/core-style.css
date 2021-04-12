@@ -352,23 +352,7 @@ img {
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.2);
 }
 
-#wrapper.karl-side-menu-open {
-    top: 0;
-    left: 300px;
-    -webkit-transition-duration: 500ms;
-    transition-duration: 500ms;
-}
 
-#wrapper.karl-side-menu-open:after {
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    content: '';
-    position: absolute;
-    z-index: 1200;
-}
 
 /* ------------------------
 :: 5.0 Header Area CSS
@@ -1089,11 +1073,14 @@ img {
 .product-img {
     position: relative;
     z-index: 1;
-    overflow: hidden
+    overflow: hidden;
+        height: 250px;
 }
 
 .product-img > img {
     width: 100%;
+    height:100%;
+    object-fit:cover;
     -webkit-transition-duration: 500ms;
     transition-duration: 500ms;
 }

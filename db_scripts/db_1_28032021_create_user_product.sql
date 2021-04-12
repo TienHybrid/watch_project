@@ -1,6 +1,7 @@
 CREATE TABLE "User" (
 	id serial NOT NULL,
 	username varchar(60) NOT NULL,
+	fullname varchar(60) NULL,
 	email varchar(255) NOT NULL,
 	"password" varchar(255) NOT NULL,
   	address varchar NULL,
@@ -15,6 +16,7 @@ CREATE TABLE "User" (
 CREATE TABLE Staff (
 	id serial NOT NULL,
 	username varchar(60) NOT NULL,
+	fullname varchar(60) NULL,
 	email varchar(255) NOT NULL,
 	"password" varchar(255) NOT NULL,
   	address varchar NULL,

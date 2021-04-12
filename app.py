@@ -6,12 +6,12 @@ import logging
 from logging import Formatter, FileHandler
 
 from flask import Flask
-from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
-
-from controllers.admin import admin, authentication, product_management, user_management, category_management,staff_management
-from controllers.client import main, product, cart
-from models import Staff
+from libs.sql_action import db
+from controllers.admin import admin, product_management, user_management, category_management, \
+    staff_management, authentication_admin
+from controllers.client import main, product, cart, authentication_client
+from libs.constant import none_to_empty_string
 
 
 # ----------------------------------------------------------------------------#
@@ -26,55 +26,33 @@ def create_app():
     my_app.register_blueprint(cart.mod)
     my_app.register_blueprint(product.mod)
     my_app.register_blueprint(admin.mod)
+    my_app.register_blueprint(authentication_admin.mod)
     my_app.register_blueprint(product_management.mod)
     my_app.register_blueprint(staff_management.mod)
     my_app.register_blueprint(category_management.mod)
     my_app.register_blueprint(user_management.mod)
-    my_app.register_blueprint(authentication.mod)
+    my_app.register_blueprint(authentication_client.mod)
     # init database
-    db = SQLAlchemy(my_app)
-    db.init_app(my_app)
-    # init login system
-    login_manager = LoginManager()
-    login_manager.login_view = 'authentication.login'
-    login_manager.init_app(my_app)
-
-    @login_manager.user_loader
-    def load_user(user_id):
-        # since the user_id is just the primary key of our user table, use it in the query for the user
-        return db.session.query(Staff).filter(Staff.id == int(user_id)).first()
-
+    db_base = SQLAlchemy(my_app)
+    db_base.init_app(my_app)
     return my_app
 
 
 app = create_app()
-#
-# @app.route('/')
-# def main():
-#     category = db.session.query(Category).all()
-#     return render_template('client.html', category=category)
-# Automatically tear down SQLAlchemy.
-'''
-@app.teardown_request
-def shutdown_session(exception=None):
-    db.remove()
-'''
+app.jinja_env.globals.update(none_to_empty_string=none_to_empty_string)
 
-# Login required decorator.
-'''
-def login_required(test):
-    @wraps(test)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return test(*args, **kwargs)
-        else:
-            flash('You need to login first.')
-            return redirect(url_for('login'))
-    return wrap
-'''
-# ----------------------------------------------------------------------------#
-# Controllers.
-# ----------------------------------------------------------------------------#
+
+@app.context_processor
+def inject_stage_and_region():
+    return dict(stage="alpha", region="NA")
+
+
+
+@app.after_request
+def finish_request(response):
+    """Close transaction after request"""
+    db.session.close()
+    return response
 
 
 if not app.debug:
@@ -93,7 +71,7 @@ if not app.debug:
 
 # Default port:
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
 
 # Or specify port manually:
 '''
