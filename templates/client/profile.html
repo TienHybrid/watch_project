@@ -1,0 +1,456 @@
+{% extends 'layout/base-client.html' %}
+
+{% block body %}
+<style>
+    body{
+    color: #1a202c;
+    text-align: left;
+    background-color: #e2e8f0;
+}
+.main-body {
+    padding: 15px;
+}
+.card {
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06);
+}
+.img-avatar {
+    max-width: 150px;
+    object-fit: cover;
+    height: 150px;
+}
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0 solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+}
+
+.card-body {
+    flex: 1 1 auto;
+    min-height: 1px;
+    padding: 1rem;
+}
+
+.gutters-sm {
+    margin-right: -8px;
+    margin-left: -8px;
+}
+
+.gutters-sm>.col, .gutters-sm>[class*=col-] {
+    padding-right: 8px;
+    padding-left: 8px;
+}
+.mb-3, .my-3 {
+    margin-bottom: 1rem!important;
+}
+
+.bg-gray-300 {
+    background-color: #e2e8f0;
+}
+.h-100 {
+    height: 100%!important;
+}
+.shadow-none {
+    box-shadow: none!important;
+}
+
+
+
+</style>
+<div class="container">
+    <div class="main-body">
+
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="main-breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">User</a></li>
+                <li class="breadcrumb-item active" aria-current="page">User Profile</li>
+            </ol>
+        </nav>
+        <!-- /Breadcrumb -->
+
+        <div class="row gutters-sm">
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-column align-items-center text-center">
+                            <img src={{current_user.avatar_url}} alt="Admin" class="rounded-circle img-avatar"
+                                 width="150">
+                            <div class="mt-3">
+                                <h4>{{current_user.username}}</h4>
+                                <p class="text-secondary mb-1">User</p>
+                                <button class="btn btn-primary" data-toggle="modal" data-target="#editModal">Edit
+                                    Profile
+                                </button>
+                                <button class="btn btn-outline-primary" data-toggle="modal"
+                                        data-target="#changePasswordModal">Đổi Mật Khẩu
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mt-3">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                            <h6 class="mb-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round" class="feather feather-globe mr-2 icon-inline">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                </svg>
+                                Website
+                            </h6>
+                            <span class="text-secondary">https://bootdey.com</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                            <h6 class="mb-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round" class="feather feather-github mr-2 icon-inline">
+                                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                                </svg>
+                                Github
+                            </h6>
+                            <span class="text-secondary">bootdey</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                            <h6 class="mb-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round" class="feather feather-twitter mr-2 icon-inline text-info">
+                                    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+                                </svg>
+                                Twitter
+                            </h6>
+                            <span class="text-secondary">@bootdey</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                            <h6 class="mb-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round"
+                                     class="feather feather-instagram mr-2 icon-inline text-danger">
+                                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                                </svg>
+                                Instagram
+                            </h6>
+                            <span class="text-secondary">bootdey</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                            <h6 class="mb-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round"
+                                     class="feather feather-facebook mr-2 icon-inline text-primary">
+                                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                                </svg>
+                                Facebook
+                            </h6>
+                            <span class="text-secondary">bootdey</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Full Name</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{none_to_empty_string(current_user.fullname)}}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Email</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{none_to_empty_string(current_user.email)}}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Số Điện Thoại </h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{none_to_empty_string(current_user.phone_number)}}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Địa Chỉ </h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{none_to_empty_string(current_user.address)}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+        </div>
+    </div>
+    <!-- Modal edit profile -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Chỉnh sửa Profile</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="col-12">
+                        <div class="checkout_details_area mt-50 clearfix">
+                            <form method="post" onsubmit="return submitFormData()">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="username">Username <span>*</span></label>
+                                        <input type="text" class="form-control" id="username"
+                                               value="{{current_user.username}}" disabled required>
+                                    </div>
+                                    <div class="col-md-8 mb-3">
+                                        <label for="email">Email <span>*</span></label>
+                                        <input type="text" class="form-control" id="email"
+                                               value="{{current_user.email}}" disabled required>
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <label for="fullname">Fullname</label>
+                                        <input type="text" class="form-control" id="fullname"
+                                               value="{{none_to_empty_string(current_user.fullname)}}">
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <label for="address">Địa Chỉ <span>*</span></label>
+                                        <input type="text" class="form-control mb-3" id="address"
+                                               value="{{none_to_empty_string(current_user.address)}}">
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <label for="phonenumber">Số Điện Thoại <span>*</span></label>
+                                        <input type="text" class="form-control mb-3" id="phonenumber"
+                                               value="{{none_to_empty_string(current_user.phone_number)}}">
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <img {% if current_user %}src="{{current_user.avatar_url}}" {% endif %}
+                                             id="imgAvatarId"
+                                             width="300px"
+                                             height="200px" style="object-fit: contain;"/>
+                                        <input type="file" class="btn btn-sm btn-primary" name="ipAvatar"
+                                               id="ipAvatarId"
+                                               onchange="showBannerImg(this)" {% if not current_user
+                                               %} required
+                                               {% endif %}>
+                                    </div>
+                                    <div class="col-lg-12 d-flex justify-content-center mt-2 mb-2">
+                                        <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">
+                                            Close
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                    </div>
+
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="editModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Đổi Mật Khẩu</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="col-12">
+                        <div class="checkout_details_area mt-50 clearfix">
+                            <form onsubmit="return submitChangePassword()" method="post">
+                                <div class="row">
+                                    <div class="col-12 mb-3">
+                                        <label for="oldPassword">Mật Khẩu Cũ <span>*</span></label>
+                                        <input type="password" required class="form-control mb-3" id="oldPassword"
+                                               value="">
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <label for="newPassword">Mật Khẩu Mới <span>*</span></label>
+                                        <input type="password" required class="form-control mb-3" id="newPassword"
+                                               value="">
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <label for="confirmNewPassword">Nhập Lại Mật Khẩu <span>*</span></label>
+                                        <input type="password" required class="form-control mb-3" id="confirmNewPassword"
+                                               value="">
+                                    </div>
+                                    <div class="col-lg-12 d-flex justify-content-center mt-2 mb-2">
+                                        <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">
+                                            Close
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                    </div>
+
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    </div>
+<script type="text/javascript">
+    const imgAvatar = document.getElementById('imgAvatarId')
+    {% if not current_user %} imgAvatar.style.display = 'none'; {% endif %}
+    function showBannerImg(input){
+        imgAvatar.style.display = 'inline-block'
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#imgAvatarId').attr('src', e.target.result);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    function submitFormData(){
+        swal({
+          title: "Are you sure?",
+          text: "Kiểm Tra Thông Tin Trước khi gửi",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+            var formData = new FormData();
+            const username = document.getElementById("username").value;
+            const email = document.getElementById("email").value;
+            const fullname = document.getElementById("fullname").value;
+            const phonenumber = document.getElementById("phonenumber").value;
+
+            const file = document.getElementById("ipAvatarId").files[0];
+            const address = document.getElementById("address").value;
+
+            formData.append("username", username);
+            formData.append("email", email);
+            formData.append("fullname", fullname);
+            formData.append("address", address);
+            formData.append("phone_number", phonenumber);
+
+            if(file){
+                formData.append("file", file);
+            }
+            $.ajax({
+                type: "POST",
+                url: "/profile",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    let objData = JSON.parse(data);
+                    if(objData.success){
+                        swal(objData.message, {
+                          icon: "success",
+                        });
+                        window.location= "/profile";
+                    }
+                    else{
+                        swal(objData.message, {
+                          icon: "warning",
+                        });
+                    }
+                },
+                error: function (e) {
+                     document.innerHTML =  e.responseText
+                }
+            });
+            return false;
+          } else {
+            return false;
+          }
+        });
+        return false;
+    }
+    function submitChangePassword(){
+        swal({
+          title: "Are you sure?",
+          text: "Kiểm Tra Thông Tin Trước khi đỏi mật khẩu",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+            var formData = new FormData();
+            const oldPassword = document.getElementById("oldPassword").value;
+            const newPassword = document.getElementById("newPassword").value;
+            const confirmPassword = document.getElementById("confirmNewPassword").value;
+
+            if (newPassword != confirmPassword) {
+                swal('Mật khẩu mới và mật khẩu nhập lại không giống nhau', {
+                          icon: "warning",
+                        });
+                        return
+            }
+
+            formData.append("oldPassword", oldPassword);
+            formData.append("newPassword", newPassword);
+
+            $.ajax({
+                type: "POST",
+                url: "/change-pwd",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    let objData = JSON.parse(data);
+                    if(objData.success){
+                        swal(objData.message, {
+                          icon: "success",
+                        });
+                        window.location= "/profile";
+                    }
+                    else{
+                        swal(objData.message, {
+                          icon: "warning",
+                        });
+                    }
+                },
+                error: function (e) {
+                     document.innerHTML =  e.responseText
+                }
+            });
+            return false;
+          } else {
+            return false;
+          }
+        });
+        return false;
+    }
+</script>
+</div>
+
+
+{% endblock body %}

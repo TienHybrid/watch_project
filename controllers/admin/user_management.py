@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from common.constant import ROWS_PER_PAGE
+from sqlalchemy import or_
 
 from models import User
 from libs.user_permission import admin_required
@@ -61,7 +62,13 @@ def handle_create_or_update_user(form, id_user, file):
 @admin_required
 def user_management():
     page = request.args.get('page', 1, type=int)
-    list_user = db.session.query(User).filter(User.is_deleted.is_(False)).paginate(page=page, per_page=ROWS_PER_PAGE)
+    search = request.args.get('search', None)
+    list_user = db.session.query(User).filter(User.is_deleted.is_(False))
+
+    if search:
+        list_user = list_user.filter(or_(User.username.like('%' + search + '%')))
+    list_user = list_user.paginate(page=page, per_page=ROWS_PER_PAGE)
+
     return render_template('user_management.html', users=list_user)
 
 

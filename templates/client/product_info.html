@@ -28,37 +28,20 @@
                             <div id="product_details_slider" class="carousel slide" data-ride="carousel">
 
                                 <ol class="carousel-indicators">
-                                    <li class="active" data-target="#product_details_slider" data-slide-to="0" style="background-image: url(static/client/assets/img/product-img/product-9.jpg);">
+                                    {% for item in current_product.image_url %}
+                                    <li class="active" data-target="#product_details_slider" data-slide-to="{{loop.index}}" style="background-image: url({{item}});">
                                     </li>
-                                    <li data-target="#product_details_slider" data-slide-to="1" style="background-image: url(static/client/assets/img/product-img/product-2.jpg);">
-                                    </li>
-                                    <li data-target="#product_details_slider" data-slide-to="2" style="background-image: url(static/client/assets/img/product-img/product-3.jpg);">
-                                    </li>
-                                    <li data-target="#product_details_slider" data-slide-to="3" style="background-image: url(static/client/assets/img/product-img/product-4.jpg);">
-                                    </li>
+                                    {% endfor %}
                                 </ol>
 
                                 <div class="carousel-inner">
-                                    <div class="carousel-item active">
-                                        <a class="gallery_img" href="static/client/assets/img/product-img/product-9.jpg">
-                                        <img class="d-block w-100" src="static/client/assets/img/product-img/product-9.jpg" alt="First slide">
+                                    {% for item in current_product.image_url %}
+                                    <div class="carousel-item {% if loop.index == 1%}} active {% endif%}">
+                                        <a class="gallery_img" href={{item}}>
+                                        <img class="d-block w-100" src={{item}} alt="First slide">
                                     </a>
                                     </div>
-                                    <div class="carousel-item">
-                                        <a class="gallery_img" href="static/client/assets/img/product-img/product-2.jpg">
-                                        <img class="d-block w-100" src="static/client/assets/img/product-img/product-2.jpg" alt="Second slide">
-                                    </a>
-                                    </div>
-                                    <div class="carousel-item">
-                                        <a class="gallery_img" href="static/client/assets/img/product-img/product-3.jpg">
-                                        <img class="d-block w-100" src="static/client/assets/img/product-img/product-3.jpg" alt="Third slide">
-                                    </a>
-                                    </div>
-                                    <div class="carousel-item">
-                                        <a class="gallery_img" href="static/client/assets/img/product-img/product-4.jpg">
-                                        <img class="d-block w-100" src="static/client/assets/img/product-img/product-4.jpg" alt="Fourth slide">
-                                    </a>
-                                    </div>
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
@@ -67,9 +50,9 @@
                     <div class="col-12 col-md-6">
                         <div class="single_product_desc">
 
-                            <h4 class="title"><a href="#">Long Yellow Dress</a></h4>
+                            <h4 class="title"><a href="#">{{current_product.name}}</a></h4>
 
-                            <h4 class="price">$ 39.99</h4>
+                            <h4 class="price">{{current_product.price}} VND</h4>
 
                             <p class="available">Available: <span class="text-muted">In Stock</span></p>
 
@@ -115,25 +98,12 @@
 
                                     <div id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion">
                                         <div class="card-body">
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin pharetra tempor so dales. Phasellus sagittis auctor gravida. Integ er bibendum sodales arcu id te mpus. Ut consectetur lacus.</p>
-                                            <p>Approx length 66cm/26" (Based on a UK size 8 sample) Mixed fibres</p>
-                                            <p>The Model wears a UK size 8/ EU size 36/ US size 4 and her height is 5'8"</p>
+                                            <p>{{current_product.description}}</p>
+
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card">
-                                    <div class="card-header" role="tab" id="headingTwo">
-                                        <h6 class="mb-0">
-                                            <a class="collapsed" data-toggle="collapse" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Cart Details</a>
-                                        </h6>
-                                    </div>
-                                    <div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo" data-parent="#accordion">
-                                        <div class="card-body">
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Explicabo quis in veritatis officia inventore, tempore provident dignissimos nemo, nulla quaerat. Quibusdam non, eos, voluptatem reprehenderit hic nam! Laboriosam, sapiente! Praesentium.</p>
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia magnam laborum eaque.</p>
-                                        </div>
-                                    </div>
-                                </div>
+
                                 <div class="card">
                                     <div class="card-header" role="tab" id="headingThree">
                                         <h6 class="mb-0">

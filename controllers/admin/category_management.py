@@ -6,6 +6,8 @@ from common.constant import ROWS_PER_PAGE
 import json
 from libs.upload import uploads_banner_image
 from config import CATEGORY_FOLDER
+from sqlalchemy import or_
+
 mod = Blueprint(name='category_management', import_name="__name__", url_prefix='/admin',
                 static_folder='static/admin/assets',
                 template_folder='templates/admin')
@@ -45,8 +47,12 @@ def handle_create_or_update_category(form, id_category, file):
 @admin_required
 def category_management():
     page = request.args.get('page', 1, type=int)
-    list_category = db.session.query(Category).filter(Category.is_deleted.is_(False)).paginate(page=page,
-                                                                                               per_page=ROWS_PER_PAGE)
+    search = request.args.get('search', None)
+    list_category = db.session.query(Category).filter(Category.is_deleted.is_(False))
+    if search:
+        list_category = list_category.filter(or_(Category.name.like('%' + search + '%')))
+
+    list_category = list_category.paginate(page=page, per_page=ROWS_PER_PAGE)
     return render_template('category_management.html', categories=list_category)
 
 

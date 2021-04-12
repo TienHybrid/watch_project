@@ -6,7 +6,8 @@ from templates.admin.forms import LoginForm, CreateAccountForm
 from libs.user_permission import get_admin_type_in_session, admin_required
 from libs.constant import UserTypeEnum
 
-mod = Blueprint(name='authentication', import_name="__name__", url_prefix='/admin', static_folder='static/admin/assets',
+mod = Blueprint(name='authentication_admin', import_name="__name__", url_prefix='/admin',
+                static_folder='static/admin/assets',
                 template_folder='templates/admin')
 db = SQLAlchemy()
 
@@ -87,7 +88,7 @@ def logout():
     session.pop('admin', None)
     session.pop('admin_id', None)
     session.pop('admin_type', None)
-    return redirect(url_for('authentication.login'))
+    return redirect(url_for('authentication_admin.login'))
 
 
 @mod.route('/profile')

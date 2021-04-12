@@ -140,13 +140,6 @@
         $('body').toggleClass('cart-data-open');
     })
 
-    // :: 8.0 Side Menu Active Code
-    $('#sideMenuBtn').on('click', function () {
-        $('#wrapper').toggleClass('karl-side-menu-open');
-    })
-    $('#sideMenuClose').on('click', function () {
-        $('#wrapper').removeClass('karl-side-menu-open');
-    })
 
     // :: 9.0 Magnific-popup Video Active Code
     if ($.fn.magnificPopup) {

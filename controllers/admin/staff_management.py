@@ -7,6 +7,7 @@ from libs.sql_action import safe_commit
 from libs.upload import uploads_banner_image
 from werkzeug.security import generate_password_hash
 from config import STAFF_FOLDER
+from sqlalchemy import or_
 
 import json
 db = SQLAlchemy()
@@ -37,7 +38,7 @@ def handle_create_or_update_staff(form, id_staff, file):
             fullname=fullname,
             phone_number=phone_number,
             address=address,
-            avatar_url='',
+            avatar_url=[],
             password=generate_password_hash(password, method='sha256')
         )
         db.session.add(staff)
@@ -61,7 +62,12 @@ def handle_create_or_update_staff(form, id_staff, file):
 @admin_required
 def staff_management():
     page = request.args.get('page', 1, type=int)
-    list_staff = db.session.query(Staff).filter(Staff.is_deleted.is_(False)).paginate(page=page, per_page=ROWS_PER_PAGE)
+    search = request.args.get('search', None)
+    list_staff = db.session.query(Staff).filter(Staff.is_deleted.is_(False))
+    if search:
+        list_staff = list_staff.filter(or_(Staff.username.like('%' + search + '%')))
+    list_staff = list_staff.paginate(page=page, per_page=ROWS_PER_PAGE)
+
     return render_template('staff_management.html', staffs=list_staff)
 
 
@@ -70,6 +76,7 @@ def staff_management():
 def staff_detail(id_staff):
     if request.method == 'POST':
         data = request.form
+
         staff = handle_create_or_update_staff(form=data, id_staff=id_staff, file=request.files)
         return json.dumps({'message': 'Successfully', 'id_staff': staff.id})
     else:

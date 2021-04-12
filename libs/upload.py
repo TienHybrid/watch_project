@@ -3,6 +3,8 @@ import tempfile
 from logging import getLogger
 from libs.vn_time import get_vn_time_now
 import pyrebase
+import random
+import string
 
 firebaseConfig = {
     "apiKey": "AIzaSyBVQs_SrCkIAPNyqNyzTTVP9ajvtnakWd4",
@@ -42,3 +44,13 @@ def uploads_banner_image(id, file, location):
         res = f"Error = {e}"
         logger.exception(res)
     return url
+
+
+def random_pwd():
+    """
+    Get random password pf length 8 with letters, digits, and symbols
+    :return:
+    """
+    password_characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(password_characters) for i in range(8))
+    return password

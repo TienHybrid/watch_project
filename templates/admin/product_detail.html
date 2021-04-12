@@ -38,6 +38,7 @@ div.desc {
 </div>
 <!-- Page content -->
 <div class="container-fluid mt--6">
+
     <div class="row">
         <div class="col-xl-12 order-xl-1">
             <div class="card">
@@ -165,22 +166,16 @@ div.desc {
         if(window.File && window.FileList && window.FileReader)
         {
             if (input.files && input.files[0]) {
-                previewFiles.push(input.files[0]);
+                previewFiles.push({id:previewFiles.length === 0 ? 0 : previewFiles[previewFiles.length-1].id +1, file:input.files[0]});
             }
         }
         getPreviewFiles(previewFiles)
     }
     function getPreviewFiles(selectedFiles){
         let output = document.getElementById("image-preview-group");
-           output.innerHTML = ''
-          for(var i = 0; i< selectedFiles.length; i++)
-            {
-                let file = selectedFiles[i];
-
-                //Only pics
-                if(!file.type.match('image'))
-                  continue;
-
+        output.innerHTML = ''
+        let mapping = selectedFiles.filter(item => {
+            let file = item.file
                 var picReader = new FileReader();
 
                 picReader.addEventListener("load",function(event){
@@ -189,28 +184,23 @@ div.desc {
 
                     var div = document.createElement("div");
 
-                    div.innerHTML = `<div class="gallery" id="image_preview_${i}">
+                    div.innerHTML = `<div class="gallery" id="image_preview_${item.id}">
                                         <a>
                                             <img src=${picFile.result} alt="Cinque Terre">
                                         </a>
                                         <div class="desc">
-                                            <a class="btn btn-md" onclick="deletePreviewImage(${i})">
+                                            <a class="btn btn-md" onclick="deletePreviewImage(${item.id})">
                                                 <i class="fa fa-trash" style="color:red;" aria-hidden="true"></i>
                                             </a>
                                         </div>
                                     </div>`
                     output.insertBefore(div,null);
                 });
-
-                 //Read the image
-                picReader.readAsDataURL(file);
-            }
+            picReader.readAsDataURL(file);
+        })
     }
     function deletePreviewImage(index) {
-        const data = document.getElementById(`image_preview_${index}`);
-        data.remove();
-        previewFiles.splice(index-1, 1);
-        console.log(previewFiles)
+        previewFiles = previewFiles.filter(item => item.id !== index)
         getPreviewFiles(previewFiles)
     }
 
@@ -235,8 +225,13 @@ div.desc {
             formData.append("quantity", quantity);
             formData.append("slug", slug);
             formData.append("category_id", category);
+            if (urls.length > 0) {
+                formData.append("image_url", JSON.stringify(urls));
+            }
             if (previewFiles.length > 0) {
-                formData.append("files", previewFiles);
+                previewFiles.forEach(item => {
+                    formData.append("files", item.file)
+                })
             }
             $.ajax({
                 type: "POST",
@@ -247,7 +242,7 @@ div.desc {
                 success: function (data) {
                     let objData = JSON.parse(data);
                     let idProduct = parseInt(objData.id_product);
-                    if(idUser){
+                    if(idProduct){
                         window.location= "/admin/product_management/"+idProduct;
                     }
                     else{
@@ -257,7 +252,7 @@ div.desc {
                     }
                 },
                 error: function (e) {
-                    swal(e.responseText);
+                    document.body.innerHTML = e.responseText
                 }
             });
             return false;

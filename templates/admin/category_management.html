@@ -36,6 +36,21 @@
 
 <!-- Page content -->
 <div class="container-fluid mt--6">
+    <form class="navbar-search navbar-search-light form-inline mr-sm-3 mb-3"
+           method="get"
+           action="{{url_for('category_management.category_management',page=categories.prev_num,  search=request.args.get('search'))}}">
+        <div class="form-group mb-0">
+          <div class="input-group input-group-alternative input-group-merge">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fas fa-search"></i></span>
+            </div>
+            <input class="form-control" placeholder="Search" name="search" type="text">
+          </div>
+        </div>
+        <button type="button" class="close" data-action="search-close" data-target="#navbar-search-main" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </form>
     <div class="row">
         <div class="col">
             <div class="card">
@@ -73,7 +88,7 @@
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
                                         <a class="dropdown-item"
-                                           href="{{url_for('category_management.category_detail', id_category = category.id)}}">Sửa</a>
+                                           href="{{url_for('category_management.category_detail', id_category = category.id,  search=request.args.get('search'))}}">Sửa</a>
                                         <a class="dropdown-item"  id="{{category.id}}" onclick="deleteCategory(this)">Xóa</a>
                                     </div>
                                 </div>
@@ -89,7 +104,7 @@
                         <ul class="pagination justify-content-end mb-0">
                             <li class="page-item {% if categories.page == 1 %}disabled{% endif %}">
                                 <a class="page-link"
-                                   href="{{url_for('category_management.category_management',page=categories.prev_num)}}"
+                                   href="{{url_for('category_management.category_management',page=categories.prev_num,  search=request.args.get('search'))}}"
                                    tabindex="-1"
 
                                 >
@@ -108,13 +123,13 @@
                             {% else %}
                             <li class="page-item">
                                 <a class="page-link"
-                                    href="{{url_for('category_management.category_management',page=page_num)}}">{{page_num}}</a></li>
+                                    href="{{url_for('category_management.category_management',page=page_num,  search=request.args.get('search'))}}">{{page_num}}</a></li>
                             {%endif%}
                             {%endif%}
                             {% endfor %}
                             <li class="page-item {% if not categories.next_num %}disabled{% endif %}">
                                 <a class="page-link"
-                                   href="{{url_for('category_management.category_management',page=categories.next_num)}}">
+                                   href="{{url_for('category_management.category_management',page=categories.next_num,  search=request.args.get('search'))}}">
                                     <i class="fas fa-angle-right"></i>
                                     <span class="sr-only">Next</span>
                                 </a>

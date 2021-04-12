@@ -5,8 +5,8 @@ from models import Product, Category
 from common.constant import ROWS_PER_PAGE
 from libs.upload import uploads_banner_image
 from config import PRODUCT_FOLDER
-import re
 import json
+from sqlalchemy import or_
 
 mod = Blueprint(name='product_management', import_name="__name__", url_prefix='/admin',
                 static_folder='static/admin/assets',
@@ -15,62 +15,23 @@ mod = Blueprint(name='product_management', import_name="__name__", url_prefix='/
 db = SQLAlchemy()
 
 
-def is_valid_url(url):
-    # Regex to check valid URL
-    regex = ("((http|https)://)(www.)?" +
-             "[a-zA-Z0-9@:%._\\+~#?&//=]" +
-             "{2,256}\\.[a-z]" +
-             "{2,6}\\b([-a-zA-Z0-9@:%" +
-             "._\\+~#?&//=]*)")
-
-    # Compile the ReGex
-    p = re.compile(regex)
-
-    # If the string is empty
-    # return false
-    try:
-        if (url == None):
-            return False
-
-        # Return if the string
-        # matched the ReGex
-        if (re.search(p, url)):
-            return True
-    except:
-        return False
-
-
-def check_image_url(urls):
-    invalid_urls = []
-    valid_urls = []
-    for url in urls:
-        if is_valid_url(url):
-            valid_urls.append(url)
-        else:
-            invalid_urls.append(url)
-
-    return {
-        'invalid_urls': invalid_urls,
-        'valid_urls': valid_urls
-    }
-
-
-def upload_multiple_file(id, urls, location):
+def upload_multiple_file(id_selected, urls, location):
     uploaded_urls = []
     if not urls:
         return uploaded_urls
     else:
         for url in urls:
-            data_url = uploads_banner_image(id=id, file=url, location=location)
+            data_url = uploads_banner_image(id=id_selected, file=url, location=location)
             uploaded_urls.append(data_url)
         return uploaded_urls
 
 
-def handle_create_or_update_product(form, id_product):
+def handle_create_or_update_product(form, id_product, files):
     """
     Get detail
     :param form:
     :param id_product:
+    :files files uploads
     :return:
     """
     name = form['name']
@@ -78,7 +39,7 @@ def handle_create_or_update_product(form, id_product):
     quantity = form['quantity']
     slug = form['slug']
     category_id = form['category_id']
-    image_url = form['image_url']
+    image_url = form.get('image_url', [])
     if id_product == 'add':
         product = Product(
             name=name,
@@ -86,7 +47,7 @@ def handle_create_or_update_product(form, id_product):
             quantity=quantity,
             slug=slug,
             category_id=category_id,
-            image_url=''
+            image_url=[]
         )
         db.session.add(product)
     else:
@@ -98,12 +59,14 @@ def handle_create_or_update_product(form, id_product):
         product.category_id = category_id
         db.session.merge(product)
     db.session.commit()
+    uploaded_urls = []
+    contain_files = []
+    if len(files) > 0:
+        uploaded_urls = upload_multiple_file(id_selected=product.id, urls=files, location=PRODUCT_FOLDER)
     if len(image_url) > 0:
-        array_parse = json.loads(image_url)
-        urls = check_image_url(array_parse)
-        uploaded_urls = upload_multiple_file(id=product.id, urls=urls['invalid_urls'], location=PRODUCT_FOLDER)
-        db.session.query(Product).filter_by(id=product.id).update(image_url=urls['valid_urls'] + uploaded_urls)
-        db.session.commit()
+        contain_files = json.loads(image_url)
+    db.session.query(Product).filter_by(id=product.id).update(dict(image_url=uploaded_urls + contain_files))
+    db.session.commit()
     return product
 
 
@@ -111,8 +74,11 @@ def handle_create_or_update_product(form, id_product):
 @admin_required
 def product_management():
     page = request.args.get('page', 1, type=int)
-    list_product = db.session.query(Product).filter(Product.is_deleted.is_(False)).paginate(page=page,
-                                                                                            per_page=ROWS_PER_PAGE)
+    search = request.args.get('search')
+    list_product = db.session.query(Product).filter(Product.is_deleted.is_(False))
+    if search:
+        list_product = list_product.filter(or_(Product.name.like('%' + search + '%')))
+    list_product = list_product.order_by(Product.updated_at.desc()).paginate(page=page, per_page=ROWS_PER_PAGE)
     return render_template('product_management.html', products=list_product)
 
 
@@ -121,9 +87,8 @@ def product_management():
 def product_detail(id_product):
     if request.method == 'POST':
         data = request.form
-        uploaded_files = request.files.getlist("image_url")
-
-        product = handle_create_or_update_product(form=data, id_product=id_product)
+        uploaded_files = request.files.getlist("files")
+        product = handle_create_or_update_product(form=data, id_product=id_product, files=uploaded_files)
         return json.dumps({'message': 'Successfully', 'id_product': product.id})
     else:
         list_category = db.session.query(Category).filter(Category.is_deleted.is_(False))
