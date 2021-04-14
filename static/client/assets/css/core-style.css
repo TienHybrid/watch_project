@@ -566,7 +566,6 @@ img {
 .dropdown-menu .dropdown-item:hover {
     color: #fff;
     text-decoration: none;
-    background-color: #ff084e;
     font-weight: 700;
 }
 
@@ -671,27 +670,13 @@ img {
     line-height: 40px;
 }
 
-.menu-content li .sub-menu li a:before {
-    width: 10px;
-    height: 10px;
-    border: 1px solid #858585;
-    background-color: transparent;
-    border-radius: 2px;
-    display: inline-block;
-    margin-left: 10px;
-    margin-right: 10px;
-    content: '';
-    position: absolute;
-    top: 15px;
-    left: 0;
-}
 
 .menu-content > li > a:before {
     width: 10px;
     height: 10px;
     border: 1px solid #ff084e;
-    background-color: #ff084e;
     border-radius: 2px;
+    background-color: transparent !important;
     display: inline-block;
     margin-left: 10px;
     margin-right: 10px;
@@ -700,6 +685,7 @@ img {
     top: 18px;
     left: 0;
 }
+
 
 .menu-content > li.collapsed > a:before {
     width: 10px;

@@ -1,25 +1,68 @@
 {% extends 'layout/base-client.html' %}
 
 {% block body %}
+<style type="text/css">
+    .menu-content li a:before {
+        background-color: transparent;
+    }
+
+    .active-cat a:before {
+        background-color: #ff084e !important;
+    }
+
+    .disabled-tag {
+        pointer-events: none !important;
+        cursor: default !important;
+        text-decoration: line-through !important;
+    }
+</style>
 
 <section class="shop_grid_area section_padding_100">
     <div class="container">
         <div class="row">
             <div class="col-12 col-md-4 col-lg-3">
                 <div class="shop_sidebar_area">
-
+                    <div class="form-group mb-2">
+                        <form class="navbar-search navbar-search-light form-inline mr-sm-3 mb-3"
+                              method="get"
+                              action="{{url_for('product.product',
+                              page=products.prev_num,
+                              id_price=request.args.get('id_price'),
+                              id_category=request.args.get('id_category'),
+                              search=request.args.get('search'))}}">
+                            <div class="input-group input-group-alternative input-group-merge">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa fa-search"></i></span>
+                                </div>
+                                <input class="form-control" value="{{none_to_empty_string(request.args.get('search'))}}"
+                                      required placeholder="Tìm Kiếm..." name="search" type="text">
+                            </div>
+                        </form>
+                    </div>
                     <div class="widget catagory mb-50">
                         <!--  Side Nav  -->
                         <div class="nav-side-menu">
                             <h6 class="mb-0">Catagories</h6>
                             <div class="menu-list">
-                                <ul class="menu-content collapse out" id="menu-content2">
+                                <ul class="menu-content">
                                     <!-- Single Item -->
-                                    <li data-target="#women2" data-toggle="collapse">
-                                        {% for category in categories %}
-                                        <a href="#">{{category.name}}</a>
-                                        {% endfor %}
+                                    {% set id_cat = request.args.get('id_category') %}
+                                    {% for category in categories %}
+                                    <li
+                                            {% if category.id== id_cat %}
+                                            class="active-cat"
+                                            {% endif %}>
+                                        <a href="{{url_for('product.product',
+                                        page=products.prev_num,
+                                        id_price=request.args.get('id_price'),
+                                        id_category=category.id,
+                                        search=request.args.get('search'))}}"
+                                           {% if category.id== id_cat %}
+                                           class="disabled-tag"
+                                           {% endif %}
+                                        >{{category.name}}</a>
                                     </li>
+                                    {% endfor %}
                                 </ul>
                             </div>
                         </div>
@@ -27,49 +70,40 @@
 
                     <div class="widget price mb-50">
                         <h6 class="widget-title mb-30">Filter by Price</h6>
-                        <div class="widget-desc">
-                            <div class="slider-range">
-                                <div class="slider-range-price ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"
-                                     data-label-result="Price:" data-max="3000"
-                                     data-min="0"
-                                     data-unit="$" data-value-max="1350" data-value-min="0">
-                                    <div class="ui-slider-range ui-widget-header ui-corner-all"></div>
-                                    <span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0"></span>
-                                    <span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0"></span>
-                                </div>
-                                <div class="range-price">Price: 0 - 1350</div>
+                        <div class="menu-list">
+                                <ul class="menu-content">
+                                    <!-- Single Item -->
+                                    {% for price in prices %}
+                                    <li  {% if price.id== request.args.get('id_price') %}
+                                            class="active-cat"
+                                            {% endif %}>
+                                        <a href="{{url_for('product.product',
+                                        page=products.prev_num,
+                                        id_price=price.id,
+                                        id_category=request.args.get('id_category'),
+                                        search=request.args.get('search'))}}"
+                                           {% if price.id == request.args.get('price') %}
+                                           class="disabled-tag"
+                                           {% endif %}
+                                        >{{price.name}}</a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
                             </div>
-                        </div>
+<!--                        <div class="widget-desc">-->
+<!--                            <div class="slider-range">-->
+<!--                                <div class="slider-range-price ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"-->
+<!--                                     data-label-result="Price:" data-max="3000"-->
+<!--                                     data-min="0"-->
+<!--                                     data-unit="$" data-value-max="1350" data-value-min="0">-->
+<!--                                    <div class="ui-slider-range ui-widget-header ui-corner-all"></div>-->
+<!--                                    <span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0"></span>-->
+<!--                                    <span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0"></span>-->
+<!--                                </div>-->
+<!--                                <div class="range-price">Price: 0 - 1350</div>-->
+<!--                            </div>-->
+<!--                        </div>-->
                     </div>
-
-                    <!--                    <div class="widget color mb-70">-->
-                    <!--                        <h6 class="widget-title mb-30">Filter by Color</h6>-->
-                    <!--                        <div class="widget-desc">-->
-                    <!--                            <ul class="d-flex justify-content-between">-->
-                    <!--                                <li class="gray"><a href="#"><span>(3)</span></a></li>-->
-                    <!--                                <li class="red"><a href="#"><span>(25)</span></a></li>-->
-                    <!--                                <li class="yellow"><a href="#"><span>(112)</span></a></li>-->
-                    <!--                                <li class="green"><a href="#"><span>(72)</span></a></li>-->
-                    <!--                                <li class="teal"><a href="#"><span>(9)</span></a></li>-->
-                    <!--                                <li class="cyan"><a href="#"><span>(29)</span></a></li>-->
-                    <!--                            </ul>-->
-                    <!--                        </div>-->
-                    <!--                    </div>-->
-
-                    <div class="widget size mb-50">
-                        <h6 class="widget-title mb-30">Filter by Size</h6>
-                        <div class="widget-desc">
-                            <ul class="d-flex justify-content-between">
-                                <li><a href="#">XS</a></li>
-                                <li><a href="#">S</a></li>
-                                <li><a href="#">M</a></li>
-                                <li><a href="#">L</a></li>
-                                <li><a href="#">XL</a></li>
-                                <li><a href="#">XXL</a></li>
-                            </ul>
-                        </div>
-                    </div>
-
                     <div class="widget recommended">
                         <h6 class="widget-title mb-30">Recommended</h6>
 
@@ -120,7 +154,10 @@
                             <div class="product-img">
                                 <img alt="" src="{{product.image_url[0]}}">
                                 <div class="product-quicview">
-                                    <a href="{{url_for('product.product_detail', id_product = product.id)}}"><i
+                                    <a href="{{url_for('product.product_detail',
+                                     id_category=request.args.get('id_category'),
+                                     id_price=request.args.get('id_price'),
+                                     id_product = product.id)}}"><i
                                             class="fa fa-eye"></i></a>
                                 </div>
                             </div>
@@ -142,7 +179,11 @@
                         <ul class="pagination pagination-sm">
                             <li class="page-item {% if products.page == 1 %}disabled{% endif %}">
                                 <a class="page-link"
-                                   href="{{url_for('product.product', page=products.prev_num, search=request.args.get('search'))}}">
+                                   href="{{url_for('product.product',
+                                   id_price=request.args.get('id_price'),
+                                   id_category=request.args.get('id_category'),
+                                   page=products.prev_num,
+                                   search=request.args.get('search'))}}">
                                     <i class="fa fa-angle-left"></i>
                                     <span class="sr-only">Previous</span>
                                 </a></li>
@@ -154,7 +195,11 @@
                             {% else %}
                             <li class="page-item">
                                 <a class="page-link"
-                                   href="{{url_for('product.product',page=page_num, search=request.args.get('search'))}}">
+                                   href="{{url_for('product.product',
+                                   id_category=request.args.get('id_category'),
+                                   id_price=request.args.get('id_price'),
+                                   page=page_num,
+                                    search=request.args.get('search'))}}">
                                     {{page_num}}
                                 </a>
                             </li>
@@ -163,7 +208,11 @@
                             {% endfor %}
                             <li class="page-item ">
                                 <a class="page-link {% if not products.next_num %}disabled{% endif %}"
-                                   href="{{url_for('product.product',page=products.next_num,  search=request.args.get('search'))}}">
+                                   href="{{url_for('product.product',
+                                   id_category=request.args.get('id_category'),
+                                   page=products.next_num,
+                                   id_price=request.args.get('id_price'),
+                                   search=request.args.get('search'))}}">
                                     <i class="fa fa-angle-right"></i>
                                     <span class="sr-only">Next</span>
                                 </a>
