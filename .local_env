@@ -1,4 +1,4 @@
-SQLALCHEMY_DATABASE_URI=postgresql://postgres:1@database:5433/watch
+SQLALCHEMY_DATABASE_URI=postgresql://postgres:1@database:5432/watch
 POSTGRES_ROOT_PASSWORD=1
 POSTGRES_DB=watch
 POSTGRES_USER=postgres
