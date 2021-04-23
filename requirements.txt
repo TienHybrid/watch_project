@@ -5,7 +5,7 @@ WTForms
 coverage
 # ecdsa
 # paramiko
-# pycrypto
+pycrypto
 email_validator
 flask-sqlacodegen
 psycopg2

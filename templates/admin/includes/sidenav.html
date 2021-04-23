@@ -30,11 +30,9 @@
                 </ul>
                 <!-- Divider -->
                 <hr class="my-3">
-                <!-- Heading -->
                 <h6 class="navbar-heading p-0 text-muted">
-                    <span class="docs-normal">Quản Lý</span>
+                    <span class="docs-normal">Sản Phẩm</span>
                 </h6>
-                <!-- Navigation -->
                 <ul class="navbar-nav mb-md-3">
                     <li class="nav-item">
                         <a class="nav-link" href="{{url_for('product_management.product_management')}}">
@@ -42,6 +40,39 @@
                             <span class="nav-link-text">Sản Phẩm</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('category_management.category_management')}}">
+                            <i class="ni ni-palette"></i>
+                            <span class="nav-link-text">Loại Sản Phẩm</span>
+                        </a>
+                    </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('place_management.place_management')}}">
+                            <i class="ni ni-palette"></i>
+                            <span class="nav-link-text">Thành Phố</span>
+                        </a>
+                    </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('voucher_management.voucher_management')}}">
+                            <i class="ni ni-palette"></i>
+                            <span class="nav-link-text">Voucher</span>
+                        </a>
+                    </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('stock_management.stock_management')}}">
+                            <i class="ni ni-palette"></i>
+                            <span class="nav-link-text">Kho Hàng</span>
+                        </a>
+                    </li>
+                </ul>
+                    <!-- Divider -->
+                <hr class="my-3">
+                <!-- Heading -->
+                <h6 class="navbar-heading p-0 text-muted">
+                    <span class="docs-normal">Tài Khoản</span>
+                </h6>
+                <!-- Navigation -->
+                <ul class="navbar-nav mb-md-3">
                     <li class="nav-item">
                         <a class="nav-link" href="{{url_for('user_management.user_management')}}">
                             <i class="ni ni-palette"></i>
@@ -52,12 +83,6 @@
                         <a class="nav-link" href="{{url_for('staff_management.staff_management')}}">
                             <i class="ni ni-palette"></i>
                             <span class="nav-link-text">Nhân Viên</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('category_management.category_management')}}">
-                            <i class="ni ni-palette"></i>
-                            <span class="nav-link-text">Loại Sản Phẩm</span>
                         </a>
                     </li>
                 </ul>

@@ -2,14 +2,13 @@ from flask import Blueprint, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from common.constant import ROWS_PER_PAGE
 from sqlalchemy import or_
-
+from service.voucher import get_voucher_by_voucher_id, get_all_voucher
 from models import User
 from libs.user_permission import admin_required
 from libs.upload import uploads_banner_image
 from werkzeug.security import generate_password_hash
 from config import USER_FOLDER
 import json
-
 mod = Blueprint(name='user_management', import_name="__name__", url_prefix='/admin',
                 static_folder='static/admin/assets',
                 template_folder='templates/admin')
@@ -29,7 +28,7 @@ def handle_create_or_update_user(form, id_user, file):
     fullname = form['fullname']
     phone_number = form['phone_number']
     address = form['address']
-
+    voucher = json.loads(form['voucher']) if form['voucher'] else []
     if id_user == 'add':
         password = form['password']
         user = User(
@@ -39,6 +38,7 @@ def handle_create_or_update_user(form, id_user, file):
             phone_number=phone_number,
             address=address,
             avatar_url='',
+            voucher=voucher,
             password=generate_password_hash(password, method='sha256')
         )
         db.session.add(user)
@@ -49,6 +49,7 @@ def handle_create_or_update_user(form, id_user, file):
         user.fullname = fullname
         user.phone_number = phone_number
         user.address = address
+        user.voucher = voucher
         db.session.merge(user)
     db.session.commit()
     if len(file) > 0:
@@ -75,18 +76,19 @@ def user_management():
 @mod.route('/user_management/<id_user>', methods=['GET', 'POST'])
 @admin_required
 def user_detail(id_user):
+    all_voucher = get_all_voucher()
     if request.method == 'POST':
         data = request.form
         user = handle_create_or_update_user(form=data, id_user=id_user, file=request.files)
         return json.dumps({'message': 'Successfully', 'id_user': user.id})
     else:
         if id_user == 'add':
-            return render_template('user_detail.html', title='Thêm Mới Người Dùng', id_user='add', user={})
+            return render_template('user_detail.html', title='Thêm Mới Người Dùng', id_user='add', user={}, all_voucher=all_voucher)
         else:
             current_user = db.session.query(User).filter(User.id == int(id_user),
                                                          User.is_deleted.is_(False)).first()
             return render_template('user_detail.html', title='Chỉnh Sửa Người Dùng', user=current_user,
-                                   id_user=id_user)
+                                   id_user=id_user, all_voucher=all_voucher)
 
 
 @mod.route('/user_management/delete/<id_user>', methods=['POST'])

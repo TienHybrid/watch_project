@@ -1,0 +1,33 @@
+version: '3'
+services:
+  backend:
+    build:
+      context: .
+    image: isms-crengine:latest
+    command: "sh run_service.sh"
+    env_file:
+      - ./.local_env
+    depends_on:
+      - database
+    links:
+      - database:database
+    networks:
+      - my-network
+    volumes:
+      - .:/app
+      - ./../storage:/isms-data
+    ports:
+      - '5001:5000'
+
+  database:
+    image: "postgres"
+    env_file:
+      - ./.local_env
+    ports:
+      - '5433:5432'
+    networks:
+      - my-network
+    volumes:
+      - ./watch-db:/var/lib/postgresql/data/
+networks:
+  my-network:

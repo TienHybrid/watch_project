@@ -1,5 +1,12 @@
 {% extends 'layout/base-client.html' %}
+
 {% block body %}
+<style type="text/css">
+    .img-product {
+        height:500px;
+        object-fit: cover;
+    }
+</style>
    <!-- <<<<<<<<<<<<<<<<<<<< Breadcumb Area Start <<<<<<<<<<<<<<<<<<<< -->
         <div class="breadcumb_area">
             <div class="container">
@@ -38,7 +45,7 @@
                                     {% for item in current_product.image_url %}
                                     <div class="carousel-item {% if loop.index == 1%}} active {% endif%}">
                                         <a class="gallery_img" href={{item}}>
-                                        <img class="d-block w-100" src={{item}} alt="First slide">
+                                        <img class="d-block w-100 img-product" src={{item}} alt="First slide">
                                     </a>
                                     </div>
                                     {% endfor %}

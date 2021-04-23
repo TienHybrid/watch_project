@@ -1,0 +1,1 @@
+alter table stockinproduct drop column name;

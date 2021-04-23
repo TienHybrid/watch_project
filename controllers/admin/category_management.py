@@ -72,3 +72,14 @@ def category_detail(id_category):
                                                                  Category.is_deleted.is_(False)).first()
             return render_template('category_detail.html', title='Chỉnh Sửa Loại Sản Phẩm', category=current_category,
                                    id_category=id_category)
+
+
+@mod.route('/category_management/delete/<id_category>', methods=['POST'])
+@admin_required
+def delete_category_detail(id_category):
+    current_category = db.session.query(Category).filter(Category.id == int(id_category),
+                                                       Category.is_deleted.is_(False)).first()
+    if current_category:
+        current_category.is_deleted = True
+        db.session.commit()
+    return 'Delete question successfully'

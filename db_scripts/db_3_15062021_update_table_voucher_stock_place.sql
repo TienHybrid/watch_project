@@ -44,3 +44,11 @@ CREATE TABLE StockInProduct (
 	CONSTRAINT stock_fk FOREIGN KEY (stock_id) REFERENCES Stock("id"),
 	CONSTRAINT product_fk FOREIGN KEY (product_id) REFERENCES Product("id")
 );
+
+ALTER TABLE Voucher ADD COLUMN discount integer default 0;
+ALTER TABLE Voucher ADD COLUMN active boolean default FALSE ;
+ALTER TABLE Voucher ADD COLUMN code varchar default '' ;
+ALTER TABLE "User" ADD COLUMN voucher int[];
+ALTER TABLE "User" alter column voucher SET DEFAULT array[]::int[];
+
+

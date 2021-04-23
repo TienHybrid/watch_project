@@ -9,7 +9,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from libs.sql_action import db
 from controllers.admin import admin, product_management, user_management, category_management, \
-    staff_management, authentication_admin
+    staff_management, authentication_admin, place_management, voucher_management, stock_management
 from controllers.client import main, product, cart, authentication_client
 from libs.constant import none_to_empty_string
 
@@ -29,6 +29,9 @@ def create_app():
     my_app.register_blueprint(authentication_admin.mod)
     my_app.register_blueprint(product_management.mod)
     my_app.register_blueprint(staff_management.mod)
+    my_app.register_blueprint(place_management.mod)
+    my_app.register_blueprint(voucher_management.mod)
+    my_app.register_blueprint(stock_management.mod)
     my_app.register_blueprint(category_management.mod)
     my_app.register_blueprint(user_management.mod)
     my_app.register_blueprint(authentication_client.mod)

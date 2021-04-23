@@ -77,7 +77,12 @@ Project Structure
 3. Install the dependencies:
   ```
   $ pip install -r requirements.txt
+  ``` 
+4. Connect Database:
   ```
+  sqlacodegen postgresql://postgres:1@localhost:5432/watch >models.py
+
+  ``` 
 
 5. Run the development server:
   ```

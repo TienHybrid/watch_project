@@ -3,7 +3,7 @@
 {% block title %} Profile {% endblock title %}
 
 {% block content %}
-
+<link rel="stylesheet" href="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1569006288/BBBootstrap/choices.min.css?version=7.0.0">
 <div class="header pb-6 d-flex align-items-center"
      style="min-height: 100px; background-image: url(/static/assets/img/theme/profile-cover.jpg); background-size: cover; background-position: center top;">
     <!-- Mask -->
@@ -102,6 +102,77 @@
                                 </div>
                             </div>
                         </div>
+                         <div class="pl-lg-4">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="input-address">Voucher Áp Dụng Cho Tất Cả
+                                            User:</label>
+                                        <div class="table-responsive">
+                                            <div>
+                                                <table class="table align-items-center">
+                                                    <thead class="thead-light">
+                                                    <tr>
+                                                        <th scope="col">
+                                                            Tên
+                                                        </th>
+                                                        <th scope="col">
+                                                            Mã Code
+                                                        </th>
+
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody class="list">
+                                                    {% for voucher in all_voucher %}
+                                                    {% if voucher.type == 'all_user'%}
+                                                    <tr>
+                                                        <th scope="row" class="name">
+                                                            {{voucher.name}}
+                                                        </th>
+                                                        <td class="budget">
+                                                            <span class="badge badge-default">{{voucher.code}}</span>
+                                                        </td>
+                                                    </tr>
+                                                    {% endif %}
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                         </div>
+                        <div class="pl-lg-4">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="input-address">
+                                            Voucher Áp Dụng Cho User
+                                        </label>
+                                    </div>
+                                </div>
+                                 <div class="col-md-12">
+                                     <select id="choices-multiple-remove-button"
+
+                                             placeholder="Voucher..." multiple >
+                                            {% for voucher in all_voucher %}
+                                                    {% if voucher.type == 'user'%}
+                                            <option
+                                                    value="{{voucher.id}}"
+                                                    {% if user and user.voucher%}
+                                            {% if voucher.id in user.voucher  %}
+                                                    selected
+                                                    {% endif %}
+                                                    {% endif %}
+                                            >{{voucher.code}}</option>
+                                            {% endif %}
+                                            {% endfor %}
+
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                          <div class="d-flex justify-content-center">
                     <a  class="btn btn-sm " href="{{url_for('user_management.user_management')}}" >Hủy Bỏ</a>
                     <button  class="btn btn-sm btn-primary" type="submit">Save</button>
@@ -112,10 +183,16 @@
             </div>
         </div>
     </div>
+<script src="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1569006273/BBBootstrap/choices.min.js?version=7.0.0"></script>
 
 <script type="text/javascript">
 const imgAvatar = document.getElementById('imgAvatarId')
 {% if not user %} imgAvatar.style.display = 'none'; {% endif %}
+ const multipleCancelButton = new Choices('#choices-multiple-remove-button', {
+ removeItemButton: true,
+ searchResultLimit:5,
+ renderChoiceLimit:5
+ });
 function showBannerImg(input){
         imgAvatar.style.display = 'inline-block'
         if (input.files && input.files[0]) {
@@ -141,6 +218,8 @@ function showBannerImg(input){
             const email = document.getElementById("input-email").value;
             const fullname = document.getElementById("input-fullname").value;
             const phonenumber = document.getElementById("input-phonenumber").value;
+            const selected = document.querySelectorAll('#choices-multiple-remove-button option:checked');
+            const optionValues = Array.from(selected).map(el => Number(el.value));
             {% if not user %}
             const password = document.getElementById("input-password").value;
             formData.append("password", password);
@@ -153,6 +232,9 @@ function showBannerImg(input){
             formData.append("fullname", fullname);
             formData.append("address", address);
             formData.append("phone_number", phonenumber);
+            if(optionValues){
+                formData.append("voucher",  JSON.stringify(optionValues));
+            }
 
             if(file){
                 formData.append("file", file);
@@ -176,7 +258,7 @@ function showBannerImg(input){
                     }
                 },
                 error: function (e) {
-                    swal(e.responseText);
+                    document.innerHTML = e.responseText
                 }
             });
             return false;
