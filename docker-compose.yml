@@ -28,6 +28,8 @@ services:
     networks:
       - my-network
     volumes:
-      - ./watch-db:/var/lib/postgresql/data/
+      - postgres:/data/postgres
 networks:
   my-network:
+volumes:
+    postgres:
