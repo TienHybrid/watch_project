@@ -1,24 +1,19 @@
 {% extends 'layout/base-client.html' %}
 
 {% block body %}
-<!-- ****** Top Discount Area Start ****** -->
+
+    {% if vouchers %}
+    <!-- ****** Top Discount Area Start ****** -->
 <section class="top-discount-area d-md-flex align-items-center">
+    {% for voucher in vouchers %}
     <!-- Single Discount Area -->
     <div class="single-discount-area">
-        <h5>Free Shipping &amp; Returns</h5>
-        <h6><a href="#">BUY NOW</a></h6>
+        <h5>{{ voucher.name }}</h5>
+        <h6>Sử dụng: {{ voucher.code }}</h6>
     </div>
-    <!-- Single Discount Area -->
-    <div class="single-discount-area">
-        <h5>20% Discount for all dresses</h5>
-        <h6>USE CODE: Colorlib</h6>
-    </div>
-    <!-- Single Discount Area -->
-    <div class="single-discount-area">
-        <h5>20% Discount for students</h5>
-        <h6>USE CODE: Colorlib</h6>
-    </div>
+    {% endfor %}
 </section>
+    {% endif %}
 <!-- ****** Welcome Slides Area Start ****** -->
 <section class="welcome_area">
     <div class="welcome_slides owl-carousel">

@@ -80,7 +80,7 @@ Project Structure
   ``` 
 4. Connect Database:
   ```
-  sqlacodegen postgresql://postgres:1@localhost:5432/watch >models.py
+  sqlacodegen postgresql://postgres:1@localhost:5433/watch >models.py
 
   ``` 
 

@@ -1,12 +1,12 @@
 from flask import Blueprint, render_template, session, redirect, url_for, request
-from models import Category, User
+from models import Category, User, Voucher
 from flask_sqlalchemy import SQLAlchemy
 from libs.user_permission import user_required
 import json
 from libs.upload import uploads_banner_image
 from werkzeug.security import generate_password_hash ,check_password_hash
 from config import USER_FOLDER
-from libs.sql_action import safe_commit
+from service.voucher import get_all_voucher
 from  libs.upload import random_pwd
 db = SQLAlchemy()
 mod = Blueprint(name='main', import_name="__name__", url_prefix='/', static_folder='static/client/assets',
@@ -46,8 +46,16 @@ def update_user(form, id_user, file):
 @mod.route('/')
 def main():
     category = db.session.query(Category).all()
-    return render_template('client.html', category=category)
+    list_voucher = get_all_voucher(type="all_user", limit=3)
 
+    return render_template('client.html', category=category, vouchers=list_voucher)
+
+
+@mod.route('/change-location/<id_location>')
+def change_location(id_location):
+    if id_location:
+        session['place_id'] = int(id_location)
+    return 'Done'
 
 @mod.route('/profile', methods=['GET', 'POST'])
 @user_required

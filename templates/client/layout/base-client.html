@@ -9,8 +9,9 @@
     <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <!-- Title  -->
-    <title>Karl - Fashion Ecommerce Template | Home</title>
-
+    <title>Đồng Hồ AZ</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <!-- Favicon  -->
     <link rel="icon" href="img/core-img/favicon.ico">
 
@@ -20,11 +21,20 @@
 
     <!-- Responsive CSS -->
     <link href="/static/client/assets/css/responsive.css" rel="stylesheet">
+
 </head>
 
 <body>
 {% include 'includes/side-menu.html' %}
 <div id="wrapper">
+    <div class="modal fade in bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                ...
+            </div>
+        </div>
+    </div>
     {% include 'includes/navigation.html' %}
 
     {% block body %}
@@ -32,22 +42,20 @@
 
     {% include 'includes/footer.html' %}
 </div>
-{% block javascript %}
-{% endblock javascript %}
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <!-- jQuery (Necessary for All JavaScript Plugins) -->
 <script src="/static/client/assets/js/jquery/jquery-2.2.4.min.js"></script>
 <!-- Popper js -->
-<script src="/static/client/assets/js/popper.min.js"></script>
 <!-- Bootstrap js -->
 <script src="/static/client/assets/js/bootstrap.min.js"></script>
 <!-- Plugins js -->
 <script src="/static/client/assets/js/plugins.js"></script>
 <!-- Active js -->
 <script src="/static/client/assets/js/active.js"></script>
-
-<script src="/static/admin/assets/js/argon.js?v=1.2.0"></script>
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+{% block javascript %}
+{% endblock javascript %}
 </body>
 
 </html>

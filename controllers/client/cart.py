@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template
-from models import Category
+from flask import Blueprint, render_template, g
+from models import Category, Voucher
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -10,7 +10,9 @@ mod = Blueprint(name='cart', import_name="__name__", url_prefix='/', static_fold
 @mod.route('/cart', methods=['GET'])
 def cart():
     category = db.session.query(Category).all()
-    return render_template('cart.html', category=category)
+    list_cart = g.carts
+    list_voucher = db.session.query(Voucher).filter(Voucher.is_deleted.is_(False))
+    return render_template('cart.html', category=category, carts =list_cart, vouchers=list_voucher)
 
 
 @mod.route('/checkout', methods=['GET'])

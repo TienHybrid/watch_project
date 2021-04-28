@@ -1,11 +1,30 @@
 <!-- ****** Header Area Start ****** -->
+
 <header class="header_area">
     <!-- Top Header Area Start -->
     <div class="top_header_area">
         <div class="container h-100">
             <div class="row h-100 align-items-center justify-content-end">
+                <div class="col-md-12 col-lg-6">
+                    <div class="form-inline">
+                        <label for="location">Xem Giá, tồn kho tại:</label>
+                        <select class="form-control" id="location" onchange="changeLocation(this)">
+                            {% for place in g.places %}
+                                <option
+                                        {% if session['place_id'] == place.id %}
+                                            selected
+                                        {% endif %}
+                                            value="{{ place.id }}">
+                                    {{ place.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                <div class="col-12 col-lg-7">
+                </div>
+             <div class="col-md-12 col-lg-2">
+             </div>
+                <div class="col-md-12 col-lg-4">
                     <div class="top_single_area d-flex align-items-center">
                         <!-- Logo Area -->
                         <div class="top_logo">
@@ -15,50 +34,45 @@
                         <div class="header-cart-menu d-flex align-items-center ml-auto">
                             <!-- Cart Area -->
                             <div class="cart">
-                                <a href="#" id="header-cart-btn" target="_blank"><span class="cart_quantity">2</span> <i
-                                        class="ti-bag"></i> Your Bag $20</a>
+                                <a href="#" id="header-cart-btn" target="_blank"><span class="cart_quantity">{{ g.carts |length }}</span> <i
+                                        class="ti-bag"></i> Giỏ HÀng </a>
                                 <!-- Cart List Area Start -->
                                 <ul class="cart-list">
+                                    {% for cart_item in g.carts %}
                                     <li>
-                                        <a href="#" class="image"><img src="img/product-img/product-10.jpg"
+                                        <a href="#" class="image"><img src="{{ cart_item.image_url[0] }}"
                                                                        class="cart-thumb" alt=""></a>
                                         <div class="cart-item-desc">
-                                            <h6><a href="#">Women's Fashion</a></h6>
-                                            <p>1x - <span class="price">$10</span></p>
+                                            <h6><a href="{{ url_for('product.product_detail', id_product= cart_item.product_id) }}">{{ cart_item.product_name }}</a></h6>
+                                            <p>SL:{{ cart_item.quantity }} - <span class="price">{{ cart_item.product_price | priceFormat }} VND</span></p>
                                         </div>
                                         <span class="dropdown-product-remove"><i class="icon-cross"></i></span>
                                     </li>
-                                    <li>
-                                        <a href="#" class="image"><img src="img/product-img/product-11.jpg"
-                                                                       class="cart-thumb" alt=""></a>
-                                        <div class="cart-item-desc">
-                                            <h6><a href="#">Women's Fashion</a></h6>
-                                            <p>1x - <span class="price">$10</span></p>
-                                        </div>
-                                        <span class="dropdown-product-remove"><i class="icon-cross"></i></span>
-                                    </li>
+                                    {% endfor %}
                                     <li class="total">
-                                        <span class="pull-right">Total: $20.00</span>
-                                        <a href="{{url_for('cart.cart')}}" class="btn btn-sm btn-cart">Cart</a>
-                                        <a href="{{url_for('cart.checkout')}}" class="btn btn-sm btn-checkout">Checkout</a>
+{#                                        <span class="pull-right">Total: $20.00</span>#}
+                                        <a href="{{ url_for('cart.cart') }}" class="btn btn-sm btn-cart">Cart</a>
+                                        <a href="{{ url_for('cart.checkout') }}" class="btn btn-sm btn-checkout">Checkout</a>
                                     </li>
                                 </ul>
                             </div>
                             <!-- Example split danger button -->
-                            {% if session['user_id']%}
-                            <div class="btn-group ml-2">
-                              <button type="button" class="btn dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                  <img src={{session['user_avatar']}} width="40" height="40"/>
-                                  <span>{{session['user']}}</span>
-                                <span class="sr-only">Toggle Dropdown</span>
-                              </button>
-                              <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{{url_for('main.profile')}}">Profile</a>
-                                  <a class="dropdown-item" href="{{url_for('cart.cart')}}">Đơn Hàng</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{{url_for('authentication_client.logout')}}">Đăng Xuất</a>
-                              </div>
-                            </div>
+                            {% if session['user_id'] %}
+                                <div class="btn-group ml-2">
+                                    <button type="button" class="btn dropdown-toggle dropdown-toggle-split"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <img src={{ session['user_avatar'] }} width="40" height="40"/>
+                                        <span>{{ session['user'] }}</span>
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="{{ url_for('main.profile') }}">Profile</a>
+                                        <a class="dropdown-item" href="{{ url_for('cart.cart') }}">Đơn Hàng</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="{{ url_for('authentication_client.logout') }}">Đăng
+                                            Xuất</a>
+                                    </div>
+                                </div>
                             {% endif %}
                         </div>
                     </div>
@@ -87,45 +101,23 @@
                                     <li class="nav-item active"><a class="nav-link" href="{{ url_for('main.main') }}">Trang
                                         Chủ</a>
                                     </li>
-                                    <li class="nav-item active"><a class="nav-link" href="{{ url_for('product.product') }}">
+                                    <li class="nav-item active"><a class="nav-link"
+                                                                   href="{{ url_for('product.product') }}">
                                         Sản Phẩm</a>
                                     </li>
                                     <li class="nav-item dropdown">
                                         <a class="nav-link dropdown-toggle" href="#" id="karlDropdown" role="button"
-                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Thương
-                                            Hiệu</a>
+                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Thể Loại</a>
                                         <div class="dropdown-menu" aria-labelledby="karlDropdown">
-                                            <a class="dropdown-item" href="#">Home</a>
-                                            <a class="dropdown-item" href="#">Shop</a>
-                                            <a class="dropdown-item" href="#">Product Details</a>
-                                            <a class="dropdown-item" href="#">Cart</a>
-                                            <a class="dropdown-item" href="#">Checkout</a>
+                                            {% for category in g.categories %}
+                                            <a class="dropdown-item"
+                                               href="{{ url_for('product.product', id_category = category.id) }}">
+                                                {{ category.name }}
+                                            </a>
+                                           {% endfor %}
                                         </div>
                                     </li>
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#" id="karlDropdown" role="button"
-                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Đồng Hồ
-                                            Nam</a>
-                                        <div class="dropdown-menu" aria-labelledby="karlDropdown">
-                                            <a class="dropdown-item" href="#">Home</a>
-                                            <a class="dropdown-item" href="#">Shop</a>
-                                            <a class="dropdown-item" href="#">Product Details</a>
-                                            <a class="dropdown-item" href="#">Cart</a>
-                                            <a class="dropdown-item" href="#">Checkout</a>
-                                        </div>
-                                    </li>
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#" id="karlDropdown" role="button"
-                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Đồng Hồ
-                                            Nữ</a>
-                                        <div class="dropdown-menu" aria-labelledby="karlDropdown">
-                                            <a class="dropdown-item" href="#">Home</a>
-                                            <a class="dropdown-item" href="#">Shop</a>
-                                            <a class="dropdown-item" href="#">Product Details</a>
-                                            <a class="dropdown-item" href="#">Cart</a>
-                                            <a class="dropdown-item" href="#">Checkout</a>
-                                        </div>
-                                    </li>
+
                                     <li class="nav-item"><a class="nav-link" href="#"><span
                                             class="karl-level">hot</span> Khuyến Mại</a></li>
                                 </ul>
@@ -134,9 +126,10 @@
                     </div>
                     <!-- Help Line -->
                     {% if not session['user_id'] %}
-                    <div class="help-line">
-                        <a href="{{url_for('authentication_client.login')}}"><i class="ti-headphone-alt"></i> Đăng Nhập</a>
-                    </div>
+                        <div class="help-line">
+                            <a href="{{ url_for('authentication_client.login') }}"><i class="ti-headphone-alt"></i> Đăng
+                                Nhập</a>
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -144,6 +137,15 @@
     </div>
 </header>
 
+<script>
+    function changeLocation(obj) {
+        const place_id = document.getElementById("location").value
+        fetch(`/change-location/${place_id}`)
+          .then(function (response) {
+              window.location.reload()
+          })
+    }
+</script>
 <!-- ****** Top Discount Area End ****** -->
 
 <!-- ****** Header Area End ****** -->

@@ -40,7 +40,7 @@ def user_required(f):
     def decorated(*args, **kwargs):
         user_type = get_user_type_in_session()
         if user_type != UserTypeEnum.USER_LOGIN:
-            return redirect(url_for('client.main'))
+            return redirect(url_for('authentication_client.login'))
         return f(*args, **kwargs)
 
     return decorated

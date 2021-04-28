@@ -8,7 +8,7 @@
     }
 </style>
    <!-- <<<<<<<<<<<<<<<<<<<< Breadcumb Area Start <<<<<<<<<<<<<<<<<<<< -->
-        <div class="breadcumb_area">
+        <div class="breadcumb_area p-0">
             <div class="container">
                 <div class="row">
                     <div class="col-12">
@@ -45,7 +45,7 @@
                                     {% for item in current_product.image_url %}
                                     <div class="carousel-item {% if loop.index == 1%}} active {% endif%}">
                                         <a class="gallery_img" href={{item}}>
-                                        <img class="d-block w-100 img-product" src={{item}} alt="First slide">
+                                        <img class="d-block w-100 img-product" src={{item}} alt="First slide" />
                                     </a>
                                     </div>
                                     {% endfor %}
@@ -59,9 +59,10 @@
 
                             <h4 class="title"><a href="#">{{current_product.name}}</a></h4>
 
-                            <h4 class="price">{{current_product.price}} VND</h4>
-
-                            <p class="available">Available: <span class="text-muted">In Stock</span></p>
+                            <h4 class="price">{{current_product.price | priceFormat}} VND</h4>
+                            <h5 class="available">Thế Loại : <span class="badge badge-primary">{{ current_product.category_name }}</span></h5>
+                            <h5 class="available">Tại : <span class="badge badge-primary">{{ current_product.place_name }}</span></h5>
+                            <h5 class="available">Số Lượng <span class="text-muted">{{ current_product.quantity }}</span></h5>
 
                             <div class="single_product_ratings mb-15">
                                 <i class="fa fa-star" aria-hidden="true"></i>
@@ -70,20 +71,20 @@
                                 <i class="fa fa-star" aria-hidden="true"></i>
                                 <i class="fa fa-star-o" aria-hidden="true"></i>
                             </div>
-
-                            <div class="widget size mb-50">
-                                <h6 class="widget-title">Size</h6>
-                                <div class="widget-desc">
-                                    <ul>
-                                        <li><a href="#">32</a></li>
-                                        <li><a href="#">34</a></li>
-                                        <li><a href="#">36</a></li>
-                                        <li><a href="#">38</a></li>
-                                        <li><a href="#">40</a></li>
-                                        <li><a href="#">42</a></li>
-                                    </ul>
-                                </div>
-                            </div>
+{##}
+{#                            <div class="widget size mb-50">#}
+{#                                <h6 class="widget-title">Size</h6>#}
+{#                                <div class="widget-desc">#}
+{#                                    <ul>#}
+{#                                        <li><a href="#">32</a></li>#}
+{#                                        <li><a href="#">34</a></li>#}
+{#                                        <li><a href="#">36</a></li>#}
+{#                                        <li><a href="#">38</a></li>#}
+{#                                        <li><a href="#">40</a></li>#}
+{#                                        <li><a href="#">42</a></li>#}
+{#                                    </ul>#}
+{#                                </div>#}
+{#                            </div>#}
 
                             <!-- Add to Cart Form -->
                             <form class="cart clearfix mb-50 d-flex" method="post">
