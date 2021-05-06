@@ -18,10 +18,15 @@ def none_to_empty_string(value):
 class ORDER_TYPE(object):
     """user type"""
     __slots__ = ()
-    CART = 0
-    PAID = 1
-    SHIPPED = 2
-    DELIVERED = 3
-    FAILED = 4
-    RETURNED = 5
-    COMPLETE = 6
+    ORDER = 1
+    DELIVERED = 2
+    COMPLETED = 3
+    CANCELED = 4
+
+
+
+class SHIPPING_METHOD(object):
+    """user type"""
+    __slots__ = ()
+    COD = 0
+    PLANE =1

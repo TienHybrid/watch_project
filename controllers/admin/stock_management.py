@@ -149,7 +149,7 @@ def stock_detail(id_stock):
 @mod.route('/stock_management/stock_product/delete/<id_stock_product>', methods=['POST'])
 @admin_required
 def delete_stock_product_detail(id_stock_product):
-    current_stock_product = db.session.query(Stockinproduct).\
+    current_stock_product = db.session.query(Stockinproduct). \
         filter(Stockinproduct.id == int(id_stock_product),
                Stockinproduct.is_deleted.is_(False)).first()
     if current_stock_product:

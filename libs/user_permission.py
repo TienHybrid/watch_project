@@ -1,4 +1,4 @@
-from flask import session, redirect, url_for
+from flask import session, redirect, url_for, g
 from libs.constant import UserTypeEnum
 from functools import wraps
 
@@ -11,7 +11,7 @@ def get_admin_type_in_session():
     try:
         return admin_type
     except ValueError:
-        UserTypeEnum.NOT_LOGIN
+        return UserTypeEnum.NOT_LOGIN
 
 
 def get_user_type_in_session():
@@ -22,7 +22,7 @@ def get_user_type_in_session():
     try:
         return user_type
     except ValueError:
-        UserTypeEnum.NOT_LOGIN
+        return UserTypeEnum.NOT_LOGIN
 
 def admin_required(f):
     @wraps(f)

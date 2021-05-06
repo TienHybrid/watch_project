@@ -1,141 +1,236 @@
 {% extends 'layout/base-client.html' %}
 {% block body %}
 
-        <!-- ****** Cart Area Start ****** -->
-        <div class="cart_area section_padding_100 clearfix">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="cart-table clearfix">
-                            <table class="table table-responsive">
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Price</th>
-                                        <th>Quantity</th>
-                                        <th>Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                {% for cart_item in carts %}
-                                    <tr>
-                                        <td class="cart_product_img d-flex align-items-center">
-                                            <a href="#"><img src="{{ cart_item.image_url[0] }}" alt="Product"></a>
-                                            <h6>{{ cart_item.product_name }}</h6>
-                                        </td>
-                                        <td class="price"><span>{{ cart_item.product_price |priceFormat }}</span></td>
-                                        <td class="qty">
-                                            <div class="quantity">
-                                                <span class="qty-minus" onclick="onChangeQuantity('minus', {{ cart_item.id }}, {{ cart_item.product_price }})"><i class="fa fa-minus" aria-hidden="true"></i></span>
-                                                <input type="number" class="qty-text" id="qty-{{ cart_item.id }}" step="1" min="1" max="99" name="quantity" value="{{ cart_item.quantity }}">
-                                                <span class="qty-plus" onclick="onChangeQuantity('add', {{ cart_item.id }}, {{ cart_item.product_price }})"><i class="fa fa-plus" aria-hidden="true"></i></span>
-                                            </div>
-                                        </td>
-                                        <td class="total_price">
-                                            <input type="number"
-                                                   disabled
+    <!-- ****** Cart Area Start ****** -->
+    <div class="cart_area section_padding_100 clearfix">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="cart-table clearfix">
+                        <table class="table table-responsive">
+                            <thead>
+                            <tr>
+                                <th>Tên Sản Phẩm</th>
+                                <th>Kho</th>
+                                <th>Thành Phố</th>
+                                <th>Giá</th>
+                                <th>Số Lượng</th>
+                                <th>Tổng Tiền</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for cart_item in carts %}
+                                <tr class="cart_item">
+                                    <input type="hidden" class="pid" value="{{ cart_item.id }}">
+                                    <input type="hidden" class="stock_id" value="{{ cart_item.stock_id }}">
+                                    <input type="hidden" class="product_id" value="{{ cart_item.product_id }}">
+                                    <input type="hidden" class="price_product" value="{{ cart_item.product_price }}">
 
-                                                   value="{{ cart_item.product_price | int * cart_item.quantity | int }}"
-                                                   id="totalPrice-{{ cart_item.id }}" />
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
+                                    <td style="width: 100%!important;"
+                                        class="cart_product_img d-flex align-items-center">
+                                        <button onclick="deleteCart(this)" id="{{ cart_item.id }}" type="button"
+                                                class="p-3 close" aria-label="Close ">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <img style="max-height: 130px;max-width: 130px;object-fit: contain;"
+                                             src="{{ cart_item.image_url[0] }}" alt="Product">
+                                        <a href="{{ url_for('product.product_detail', id_product= cart_item.product_id) }}">
+                                            <h6 >{{ cart_item.product_name }}</h6></a>
+                                    </td>
+                                    <td class="stock_name"><span class="badge badge-primary">{{ cart_item.stock_name  }} </span></td>
+                                    <td class="place_name"><span class="badge badge-primary">{{ cart_item.place_name  }} </span></td>
+                                    <td class="price"><span>{{ cart_item.product_price |priceFormat }} VNĐ</span></td>
+                                    <td class="qty">
+                                        <div class="quantity">
+                                            <span class="qty-minus"
+                                                  onclick="onChangeQuantity(this, 'minus')"><i
+                                                    class="fa fa-minus" aria-hidden="true"></i></span>
+                                            <input type="number" class="qty-text" id="qty-{{ cart_item.id }}" step="1"
+                                                   min="1" max="99" name="quantity" value="{{ cart_item.quantity }}">
+                                            <span class="qty-plus"
+                                                  onclick="onChangeQuantity(this, 'add')"><i
+                                                    class="fa fa-plus" aria-hidden="true"></i></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="total_price">{{ (cart_item.product_price | int * cart_item.quantity | int) | priceFormat }} VNĐ</span>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="cart-footer d-flex mt-30">
+                        <div class="back-to-shop w-50">
+                            <a href="{{ url_for('product.product') }}">Tiếp Tục Mua Hàng</a>
                         </div>
-
-                        <div class="cart-footer d-flex mt-30">
-                            <div class="back-to-shop w-50">
-                                <a href="shop-grid-left-sidebar.html">Continue shooping</a>
-                            </div>
-                            <div class="update-checkout w-50 text-right">
-                                <a href="#">clear cart</a>
-                                <a href="#">Update cart</a>
-                            </div>
+                        <div class="back-to-shop w-50 text-right">
+                            <a href="#" onclick="updateCart()">Cập Nhật Giỏ Hàng</a>
                         </div>
+                    </div>
 
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 col-md-6 col-lg-4">
+{#                    <div class="coupon-code-area mt-70">#}
+{#                        <div class="cart-page-heading">#}
+{#                            <h5>Coupon code</h5>#}
+{#                            <p>Nhập Mã Code</p>#}
+{#                        </div>#}
+{#                        <select class="form-control" id="location">#}
+{#                            <option value="0" selected>Vui Lòng Chọn Voucher</option>#}
+{#                            {% for voucher in vouchers %}#}
+{#                                <option#}
+{#                                        value="{{ voucher.id }}">#}
+{#                                    {{ voucher.name }}- Mã :{{ voucher.code }} -#}
+{#                                </option>#}
+{#                            {% endfor %}#}
+{#                        </select>#}
+{##}
+{#                    </div>#}
+                </div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="shipping-method-area mt-70">
+                        <div class="cart-page-heading">
+                            <h5>Phương Thức Giao Hàng</h5>
+                            <p>Chọn Một Trong Phương Thức Sau</p>
+                        </div>
+{##}
+{#                        <div class="custom-control custom-radio mb-30">#}
+{#                            <input type="radio" id="customRadio2" name="customRadio" class="custom-control-input">#}
+{#                            <label class="custom-control-label d-flex align-items-center justify-content-between"#}
+{#                                   for="customRadio2"><span class="ml-4">Standard delivery</span><span>$1.99</span></label>#}
+{#                        </div>#}
+
+                        <div class="custom-control custom-radio">
+                            <input type="radio" checked id="customRadio3" name="customRadio" class="custom-control-input">
+                            <label class="custom-control-label d-flex align-items-center justify-content-between"
+                                   for="customRadio3"><span class="ml-4">Personal Pickup</span><span>Free</span></label>
+                        </div>
                     </div>
                 </div>
-
-                <div class="row">
-                    <div class="col-12 col-md-6 col-lg-4">
-                        <div class="coupon-code-area mt-70">
-                            <div class="cart-page-heading">
-                                <h5>Coupon code</h5>
-                                <p>Nhập Mã Code</p>
-                            </div>
-                            <select class="form-control" id="location">
-                            {% for voucher in vouchers %}
-                                <option
-                                            value="{{ voucher.id }}">
-                                    {{ voucher.name }}- Mã :{{ voucher.code  }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                            <form action="#">
-                                <input type="search" name="search" placeholder="#569ab15">
-                                <button type="submit">Apply</button>
-                            </form>
+                <div class="col-12 col-lg-4">
+                    <div class="cart-total-area mt-70">
+                        <div class="cart-page-heading">
+                            <h5>Tổng Giỏ Hàng</h5>
+                            <p>Thông Tin</p>
                         </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-lg-4">
-                        <div class="shipping-method-area mt-70">
-                            <div class="cart-page-heading">
-                                <h5>Shipping method</h5>
-                                <p>Select the one you want</p>
-                            </div>
 
-                            <div class="custom-control custom-radio mb-30">
-                                <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input">
-                                <label class="custom-control-label d-flex align-items-center justify-content-between" for="customRadio1"><span>Next day delivery</span><span>$4.99</span></label>
-                            </div>
-
-                            <div class="custom-control custom-radio mb-30">
-                                <input type="radio" id="customRadio2" name="customRadio" class="custom-control-input">
-                                <label class="custom-control-label d-flex align-items-center justify-content-between" for="customRadio2"><span>Standard delivery</span><span>$1.99</span></label>
-                            </div>
-
-                            <div class="custom-control custom-radio">
-                                <input type="radio" id="customRadio3" name="customRadio" class="custom-control-input">
-                                <label class="custom-control-label d-flex align-items-center justify-content-between" for="customRadio3"><span>Personal Pickup</span><span>Free</span></label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-lg-4">
-                        <div class="cart-total-area mt-70">
-                            <div class="cart-page-heading">
-                                <h5>Cart total</h5>
-                                <p>Final info</p>
-                            </div>
-
-                            <ul class="cart-total-chart">
-                                <li><span>Subtotal</span> <span>$59.90</span></li>
-                                <li><span>Shipping</span> <span>Free</span></li>
-                                <li><span><strong>Total</strong></span> <span><strong>$59.90</strong></span></li>
-                            </ul>
-                            <a href="checkout.html" class="btn karl-checkout-btn">Proceed to checkout</a>
-                        </div>
+                        <ul class="cart-total-chart">
+                            <li><span >Tổng phụ</span> <span id="subTotal"></span></li>
+                            <li><span>Shipping</span> <span>Free</span></li>
+                            <li><span><strong>Thành Giá</strong></span> <span id="totalPrice" ><strong></strong></span></li>
+                        </ul>
+                        <a href="{{ url_for('order.checkout') }}" class="btn karl-checkout-btn">Tiến Hàng Thanh Toán</a>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- ****** Cart Area End ****** -->
-<script>
-function onChangeQuantity(condition, id, priceProduct) {
-    let effect = document.getElementById(`qty-${id}`);
-    let price = document.getElementById(`totalPrice-${id}`)
-    let qty = Number(effect.value)
-    if (!isNaN(qty) && qty >0){
-        if (condition == 'minus'){
-            qty = qty - 1
-            effect.setAttribute('value', qty)
-        }
-        else {
-            qty = qty + 1
-            effect.setAttribute('value', qty)
-        }
-    }
-}
+    </div>
+    <!-- ****** Cart Area End ****** -->
+    <script>
+        let formatter = new Intl.NumberFormat({
+                maximumFractionDigits: 3
+            });
+        function onChangeQuantity(obj, condition) {
+            const element = $(obj).closest('tr')
+            let price_product = element.find(".price_product").val()
+            const quantity = element.find(".qty-text")
+            const total_price = element.find('.total_price')
 
-</script>
+            if (condition == 'add') {
+                if (quantity.val() < 99) {
+                    quantity.val(Number(quantity.val()) + 1)
+                }
+            } else {
+                if (quantity.val() > 1) {
+                    quantity.val(Number(quantity.val()) - 1)
+                }
+            }
+            total_price.html(`<span class="total_price">${formatter.format(quantity.val() * price_product)} VNĐ</span>`)
+            loadTotalPrice()
+        }
+
+        function deleteCart(obj) {
+            let idCart = obj.id;
+            swal({
+                title: "Bạn Chắc Chắn Xóa Đơn Hàng?",
+                text: "Khi Xóa , Đơn Hàng sẽ không thế hoàn tác!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/delete_cart/" + idCart,
+                            success: function (data) {
+                                swal(data, {
+                                    icon: "success",
+                                }).then(() => {
+                                    location.reload()
+                                });
+                            },
+                            error: function (e) {
+                                document.innerHTML = e.responseText
+                            }
+                        });
+                    }
+                });
+        }
+
+        function updateCart() {
+            const elements = $('tbody').find('.cart_item').get()
+            let data = []
+            elements.map(element => {
+                let cart_product_id = parseInt($(element).find('.pid').val())
+                let stock_id = parseInt($(element).find('.stock_id').val())
+                let product_id = parseInt($(element).find('.product_id').val())
+                let quantity = parseInt($(element).find('.qty-text').val())
+                data.push({cart_product_id,stock_id,product_id,quantity})
+            })
+            if (data.length > 0){
+                $.ajax({
+                            type: "POST",
+                            url: "/update_cart" ,
+                            data:{data:JSON.stringify(data)},
+                            success: function (data) {
+                                swal(data, {
+                                    icon: "success",
+                                }).then(() => {
+                                    location.reload()
+                                });
+                            },
+                            error: function (e) {
+                                document.innerHTML = e.responseText
+                            }
+                        });
+                 }
+        }
+
+        function loadTotalPrice() {
+           const elements = $('tbody').find('.cart_item').get()
+            const subTotal = $('#subTotal')
+            const total = $('#totalPrice')
+            let data = []
+            let totalPrice = 0
+            elements.map(element => {
+                let price = parseInt($(element).find('.price_product').val())
+                let quantity = parseInt($(element).find('.qty-text').val())
+                data.push({price,quantity})
+            })
+            data.map(ele =>{
+                totalPrice += ele.price * ele.quantity
+            })
+            subTotal.html(`<span id="subTotal">${formatter.format(totalPrice)} VND</span>`)
+            total.html(`<span id="totalPrice"><strong>${formatter.format(totalPrice)} VND</strong></span>`)
+        }
+
+        window.onload = function() {
+          loadTotalPrice()
+        };
+    </script>
 {% endblock %}

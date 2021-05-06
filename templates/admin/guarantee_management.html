@@ -1,0 +1,313 @@
+{% extends 'layouts/base-admin.html' %}
+
+{% block title %} Tables {% endblock title %}
+
+{% block content %}
+
+    <div class="header bg-primary pb-6">
+        <div class="container-fluid">
+            <div class="header-body">
+                <div class="row align-items-center py-4">
+                    <div class="col-lg-6 col-7">
+                        <h6 class="h2 text-white d-inline-block mb-0">Tables</h6>
+                        <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                                <li class="breadcrumb-item"><a href="{{url_for('admin.admin')}}"><i class="fas fa-home"></i></a>
+                                </li>
+                                <li class="breadcrumb-item"><a href="{{url_for('admin.admin')}}">Admin</a></li>
+                                <li class="breadcrumb-item active">Bảo Hành</li>
+                            </ol>
+                        </nav>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="container-fluid mt--6">
+        <form class="navbar-search navbar-search-light form-inline mr-sm-3 mb-3"
+              method="get"
+              action="{{url_for('guarantee_management.guarantee_management',page=guarantee_products.prev_num,  search=request.args.get('search'))}}">
+            <div class="form-group mb-0">
+                <div class="input-group input-group-alternative input-group-merge">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    </div>
+                    <input class="form-control" placeholder="Search" name="search" type="text">
+                </div>
+            </div>
+            <button type="button" class="close" data-action="search-close" data-target="#navbar-search-main"
+                    aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </form>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <!-- Card header -->
+                    <div class="card-header border-0">
+                        <h3 class="mb-0">Bảo Hành</h3>
+                    </div>
+                    <!-- Light table -->
+                    <div class="table-responsive">
+                        <table class="table align-items-center table-flush">
+                            <thead class="thead-light">
+                            <tr>
+                                <th scope="col" class="sort" data-sort="name">Mã Đơn Hàng</th>
+                                <th scope="col" class="sort" data-sort="name">Tên Sản Phẩm</th>
+                                <th scope="col" class="sort" data-sort="category_id">Tên Người Mua</th>
+                                <th scope="col" class="sort" data-sort="quantity">Địa Chỉ</th>
+                                <th scope="col" class="sort" data-sort="price">Số Điện Thoại</th>
+                                <th scope="col" class="sort" data-sort="slug">Thời gian mua</th>
+                                <th scope="col" class="sort" data-sort="slug">Thời hạn Bảo Hành</th>
+                                <th scope="col" class="sort" data-sort="slug">Giá</th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody class="list">
+                            {% for guarantee_product in list_guarantee_product %}
+                                <tr id="{{ guarantee_product.Guarantee.transaction_product_id }}" class="accordion-toggle" data-toggle="collapse"
+                                    data-target="#guarantee-{{ loop.index0 }}">
+                                    <td class="stock_name"><span
+                                            class="badge badge-primary">{{ guarantee_product.Guarantee.transaction_product_id }} </span>
+                                    </td>
+                                    <td class="place_name">{{ guarantee_product.Guarantee.product_name }}</td>
+                                    <td class="price">
+                                        <span>{{ guarantee_product.Guarantee.user_name }}</span></td>
+                                    <td class="price">
+                                        <span>{{ guarantee_product.Guarantee.address }}</span>
+                                    </td>
+                                    <td class="price">
+                                        <span>{{ guarantee_product.Guarantee.phone_number }} </span>
+                                    </td>
+                                    <td class="price">
+                                        <span>{{ guarantee_product.Guarantee.created_at.strftime('%d-%m-%Y') }} </span>
+                                    </td>
+                                    <td class="price">
+                                        {% if guarantee_product.Guarantee.guarantee_time  %}
+                                            <span>{{ guarantee_product.Guarantee.guarantee_time.strftime('%d-%m-%Y') }} </span>
+                                        {% else %}
+                                            <span>Không có dữ liệu</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="total_price"><strong>{{ (guarantee_product.Guarantee.product | int * guarantee_product.Guarantee.quantity | int) | priceFormat }}VNĐ</strong></span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="dropdown">
+                                            <a class="btn btn-sm btn-icon-only text-light"
+                                               href="#" role="button"
+                                               data-toggle="dropdown" aria-haspopup="true"
+                                               aria-expanded="false">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                <a class="dropdown-item"
+                                                   id="add"
+                                                   data-target="#modal-form"
+                                                   data-toggle="modal"
+                                                   data-content=""
+                                                   data-transactionproduct_id="{{ guarantee_product.Guarantee.transaction_product_id }}"
+                                                   onclick="openModal(this)"
+                                                >Thêm Bảo Hành</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    {% if guarantee_product.guarantee_info %}
+                                        <tr>
+                                            <td colspan="12" class="hiddenRow">
+                                                <div class="accordian-body collapse"
+                                                     id="guarantee-{{ loop.index0 }}">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                        <tr class="info">
+                                                            <th>Đơn Hàng</th>
+                                                            <th>Nội Dung</th>
+                                                            <th>Ngày Tạo</th>
+                                                            <th></th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        {% for guarantee_info in guarantee_product.guarantee_info %}
+                                                            <tr id="{{ guarantee_info.transactionproduct_id }}">
+                                                                <td><span
+                                                                        class="badge badge-primary">{{ guarantee_info.transactionproduct_id }}</span></td>
+                                                                <td id="content">{{ guarantee_info.content }}</td>
+                                                                <td>{{ guarantee_info.created_at.strftime('%d-%m-%Y') }}</td>
+                                                                <td class="text-center">
+                                                                    <div class="dropdown">
+                                                                        <a class="btn btn-sm btn-icon-only text-light"
+                                                                           href="#" role="button"
+                                                                           data-toggle="dropdown" aria-haspopup="true"
+                                                                           aria-expanded="false">
+                                                                            <i class="fas fa-ellipsis-v"></i>
+                                                                        </a>
+                                                                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                                            <a class="dropdown-item" id="{{ guarantee_info.id }}"
+                                                                               onclick="openModal(this)"
+                                                                               data-transactionproduct_id="{{ guarantee_info.transactionproduct_id }}"
+                                                                               data-content="{{ guarantee_info.content }}"
+                                                                               data-target="#modal-form"
+                                                                               data-toggle="modal"
+                                                                            >Chỉnh Sửa</a>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                        </tbody>
+                                                    </table>
+
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                </tr>
+
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Card footer -->
+                    <div class="card-footer py-4">
+                        <nav aria-label="...">
+                            <ul class="pagination justify-content-end mb-0">
+                                <li class="page-item {% if guarantee_products.page == 1 %}disabled{% endif %}">
+                                    <a class="page-link"
+                                       href="{{url_for('guarantee_management.guarantee_management', page=guarantee_products.prev_num, search=request.args.get('search'))}}"
+                                       tabindex="-1"
+
+                                    >
+                                        <i class="fas fa-angle-left"></i>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                </li>
+                                <!-- Loop through the number of pages to display a link for each-->
+                                {% for page_num in guarantee_products.iter_pages(left_edge=1, right_edge=1, left_current=1,
+                            right_current=2) %}
+                                    {% if page_num %}
+                                        {% if guarantee_products.page == page_num %}
+                                            <li class="page-item active">
+                                                <a class="page-link" href="#">{{page_num}}</a>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item">
+                                                <a class="page-link"
+                                                   href="{{url_for('guarantee_management.guarantee_management',page=page_num, search=request.args.get('search'))}}">{{page_num}}</a>
+                                            </li>
+                                        {%endif%}
+                                    {%endif%}
+                                {% endfor %}
+                                <li class="page-item ">
+                                    <a class="page-link {% if not guarantee_products.next_num %}disabled{% endif %}"
+                                       href="{{url_for('guarantee_management.guarantee_management',page=guarantee_products.next_num,  search=request.args.get('search'))}}">
+                                        <i class="fas fa-angle-right"></i>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {#    modal#}
+        <div class="col-8">
+            <div aria-hidden="true" aria-labelledby="modal-form" class="modal fade" id="modal-form" role="dialog"
+                 tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+                    <div class="modal-content ">
+                        <div class="modal-body p-0">
+                            <div class="card bg-secondary shadow border-0">
+                                <div class="card-header bg-transparent pb-5">
+                                    <div class="text-muted text-center mt-2 mb-3" ><small id="guarantee_title"></small>
+                                    </div>
+                                </div>
+                                <div class="card-body px-lg-5 py-lg-5">
+                                    <form onsubmit="return submitFormDataGuarantee()" enctype="multipart/form-data">
+                                        <div class="row">
+                                            <input type="hidden" id="guarantee_info_id">
+                                            <input type="hidden" id="transactionproduct_id">
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <label for="input-product">Nội Dung</label>
+                                                    <textarea class="form-control" id="guarantee_content" rows="3"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-center">
+                                            <a class="btn btn-sm "
+                                               class="close" data-dismiss="modal"
+                                            >Hủy Bỏ</a>
+                                            <button class="btn btn-sm btn-primary" type="submit">Save</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            function openModal(obj){
+                const guarantee_info_id = obj.id
+                const content = $(obj).data('content')
+                const transactionproduct_id = $(obj).data('transactionproduct_id')
+                $('#guarantee_title').html(`${guarantee_info_id === 'add' ? 'Thêm Bảo Hành' : 'Chỉnh Sửa Bảo hành'}`)
+                $('#guarantee_info_id').val(guarantee_info_id)
+                $('#guarantee_content').val(content)
+                $('#transactionproduct_id').val(transactionproduct_id)
+            }
+
+            function submitFormDataGuarantee(){
+                swal({
+                    title: "Are you sure?",
+                    text: "Kiểm Tra Thông Tin Trước khi gửi",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            const guarantee_info_id =  $('#guarantee_info_id').val()
+                            const guarantee_content = $('#guarantee_content').val()
+                            const transactionproduct_id = $('#transactionproduct_id').val()
+                            var formData = new FormData();
+                            formData.append('content',guarantee_content)
+                            formData.append('transactionproduct_id',transactionproduct_id)
+                            $.ajax({
+                                type: "POST",
+                                url: `/admin/update_guarantee_management/` + guarantee_info_id,
+                                data: formData,
+                                contentType: false,
+                                processData: false,
+                                success: function (data) {
+                                    swal(data, {
+                                        icon: "success",
+                                    }).then(()=> {
+                                        location.reload()
+                                    })
+                                },
+                                error: function (e) {
+                                    swal(e.responseText);
+                                }
+                            });
+                            return false;
+                        } else {
+                            return false;
+                        }
+                    });
+                return false;
+            }
+        </script>
+
+
+    </div>
+{% endblock content %}
+
+

@@ -20,4 +20,3 @@ def safe_commit():
     except Exception as e:
         logger.exception(f"Can not commit change, error = {e}")
         db.session.rollback()
-        raise

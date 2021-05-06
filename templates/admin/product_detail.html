@@ -3,141 +3,189 @@
 {% block title %} Profile {% endblock title %}
 
 {% block content %}
-<style>
-div.gallery {
-  margin: 5px;
-  border: 1px solid #ccc;
-  float: left;
-  width: 200px;
-}
+    <style>
+        div.gallery {
+            margin: 5px;
+            border: 1px solid #ccc;
+            float: left;
+            width: 200px;
+        }
 
-div.gallery:hover {
-  border: 1px solid #777;
-}
+        div.gallery:hover {
+            border: 1px solid #777;
+        }
 
-div.gallery img {
-      width: 100%;
-    height: 200px;
-    object-fit: contain;
-}
+        div.gallery img {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+        }
 
-div.desc {
-  padding: 15px;
-  text-align: center;
-}
-
-
+        div.desc {
+            padding: 15px;
+            text-align: center;
+        }
 
 
-</style>
-<div class="header pb-6 d-flex align-items-center"
-     style="min-height: 100px; background-image: url(/static/assets/img/theme/profile-cover.jpg); background-size: cover; background-position: center top;">
-    <!-- Mask -->
-    <span class="mask bg-gradient-default opacity-8"></span>
+    </style>
+    <div class="header pb-6 d-flex align-items-center"
+         style="min-height: 100px; background-image: url(/static/assets/img/theme/profile-cover.jpg); background-size: cover; background-position: center top;">
+        <!-- Mask -->
+        <span class="mask bg-gradient-default opacity-8"></span>
 
-</div>
-<!-- Page content -->
-<div class="container-fluid mt--6">
+    </div>
+    <!-- Page content -->
+    <div class="container-fluid mt--6">
 
-    <div class="row">
-        <div class="col-xl-12 order-xl-1">
-            <div class="card">
-                <div class="card-header">
-                    <div class="row align-items-center">
-                        <div class="col-8">
-                            <h3 class="mb-0">{{ title }}</h3>
+        <div class="row">
+            <div class="col-xl-12 order-xl-1">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col-8">
+                                <h3 class="mb-0">{{ title }}</h3>
+                            </div>
                         </div>
                     </div>
+                    <form method="post" onsubmit="return submitFormData()" enctype="multipart/form-data">
+                        <h6 class="heading-small text-muted mb-4 pl-3">Thông Tin Chung</h6>
+                        <div class="pl-lg-4">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="input-name">Name</label>
+                                        <input type="text" id="input-name" class="form-control"
+                                               onchange="convertToSlug(this.value)"
+                                               placeholder="Username" value="{{ product.name }}"
+                                        >
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="input-slug">Slug</label>
+                                        <input type="text" id="input-slug" class="form-control"
+                                               disabled
+                                               placeholder="slug..." value="{{ product.slug }}"
+                                        >
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-12">
+                                    {% if stocks %}
+                                        <table class="table align-items-center">
+                                            <thead class="thead-light">
+                                            <tr>
+                                                <th scope="col">
+                                                    Kho
+                                                </th>
+                                                <th scope="col">
+                                                    Thành Phố
+                                                </th>
+                                                <th scope="col">
+                                                    Số Lượng
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody class="list">
+                                            {% for stock in stocks %}
+                                                <tr>
+                                                    <th scope="row" class="name">
+                                                        {{ stock.stock_name }}
+                                                    </th>
+                                                     <th scope="row" class="name">
+                                                        {{ stock.place }}
+                                                    </th>
+                                                    <td class="budget">
+                                                        <span class="badge badge-default">{{ stock.quantity }}</span>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    {% endif %}
+                                </div>
+                                <div class="col-lg-12">
+                                    <label class="form-control-label" for="input-quantity">Hình Ảnh</label>
+
+                                    <div class="form-group">
+                                        <div id="image-group"></div>
+                                        <div id="image-preview-group"></div>
+                                        <input type="file" class="btn btn-sm btn-primary" id="preview-files"
+                                               onchange="addPreviewFile(this)"
+                                                {% if not product %} required {% endif %} >
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="input-old_price">Giá Cũ </label>
+                                        <input type="text" id="input-old_price" class="form-control" placeholder=""
+                                               value="{{ product.old_price }}"
+                                        >
+                                    </div>
+                                </div>
+                                 <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="input-price">Giá Khuyến Mại </label>
+                                        <input type="text" id="input-price" class="form-control" placeholder=""
+                                               value="{{ product.price }}"
+                                        >
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label for="input-category">Category</label>
+                                        <select class="form-control" id="input-category">
+                                            {% for category in categories %}
+                                                <option
+                                                        value="{{ category.id }}"
+                                                        {% if category.id== product.category_id %}
+                                                        selected="selected" {% endif %}>
+                                                    {{ category.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label for="input-category">Thương Hiệu</label>
+                                        <select class="form-control" id="input-brand">
+                                            {% for brand in brands %}
+                                                <option
+                                                        value="{{ brand.id }}"
+                                                        {% if brand.id== product.brand_id %}
+                                                        selected="selected" {% endif %}>
+                                                    {{ brand.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-center">
+                                <a class="btn btn-sm " href="{{ url_for('product_management.product_management') }}">Hủy
+                                    Bỏ</a>
+                                <button class="btn btn-sm btn-primary" type="submit">Save</button>
+                            </div>
+                    </form>
                 </div>
-                <form method="post" onsubmit="return submitFormData()" enctype="multipart/form-data">
-                    <h6 class="heading-small text-muted mb-4 pl-3">Thông Tin Chung</h6>
-                    <div class="pl-lg-4">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-name">Name</label>
-                                    <input type="text" id="input-name" class="form-control"
-                                           onchange="convertToSlug(this.value)"
-                                           placeholder="Username" value="{{product.name}}"
-                                    >
-                                </div>
-                            </div>
-                            <div class="col-lg-12">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-slug">Slug</label>
-                                    <input type="text" id="input-slug" class="form-control"
-                                           disabled
-                                           placeholder="slug..." value="{{product.slug}}"
-                                    >
-                                </div>
-                            </div>
-                            <div class="col-lg-12">
-                                <label class="form-control-label" for="input-quantity">Quantity</label>
 
-                                <div class="form-group">
-                                    <div id="image-group"></div>
-                                    <div id="image-preview-group"></div>
-                                    <input type="file" class="btn btn-sm btn-primary" id="preview-files"
-                                           onchange="addPreviewFile(this)"
-                                           {% if not product %} required {%endif %} >
-                                </div>
-
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-quantity">Quantity</label>
-                                    <input type="text" id="input-quantity" class="form-control"
-                                           placeholder="Họ Tên" value="{{none_to_empty_string(product.quantity)}}">
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-price">Price </label>
-                                    <input type="text" id="input-price" class="form-control" placeholder=""
-                                           value="{{product.price}}"
-                                    >
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label for="input-category">Category</label>
-                                    <select class="form-control" id="input-category">
-                                        {% for category in categories %}
-                                        <option
-                                                value="{{category.id}}"
-                                                {% if category.id== product.category_id%} selected="selected" {% endif
-                                                %}>
-                                            {{category.name}}
-                                        </option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="d-flex justify-content-center">
-                            <a class="btn btn-sm " href="{{url_for('product_management.product_management')}}">Hủy
-                                Bỏ</a>
-                            <button class="btn btn-sm btn-primary" type="submit">Save</button>
-                        </div>
-                </form>
             </div>
-
         </div>
     </div>
-</div>
 
-<script type="text/javascript">
-    // get image url from product
-    let urls = {{product.image_url |safe }} {% if not product %} [] {% endif%}
-    let previewFiles = []
-    function getImageUrl(url_selected) {
-        const avatarGroup = document.getElementById('image-group');
-        if(!urls) return
-        else {
-            url = url_selected.map((item,index) => {
-                return `<div class="gallery" id="image_${index}">
+    <script type="text/javascript">
+        // get image url from product
+        let urls = {{product.image_url |safe }} {% if not product %} [] {% endif%}
+        let previewFiles = []
+
+        function getImageUrl(url_selected) {
+            const avatarGroup = document.getElementById('image-group');
+            if (!urls) return
+            else {
+                url = url_selected.map((item, index) => {
+                    return `<div class="gallery" id="image_${index}">
                                         <a>
                                             <img src=${item} alt="Cinque Terre">
                                         </a>
@@ -147,38 +195,43 @@ div.desc {
                                             </a>
                                         </div>
                                     </div>`
-            })
-            avatarGroup.innerHTML = url.join("");
-        }
-    }
-    function deleteImage(index){
-        const data = document.getElementById(`image_${index}`);
-        data.remove();
-        urls.splice(index, 1);
-        getImageUrl(urls)
-     }
-    getImageUrl(urls)
-   //add preview image url files
-
-
-    //Check File API support
-    function addPreviewFile(input){
-        if(window.File && window.FileList && window.FileReader)
-        {
-            if (input.files && input.files[0]) {
-                previewFiles.push({id:previewFiles.length === 0 ? 0 : previewFiles[previewFiles.length-1].id +1, file:input.files[0]});
+                })
+                avatarGroup.innerHTML = url.join("");
             }
         }
-        getPreviewFiles(previewFiles)
-    }
-    function getPreviewFiles(selectedFiles){
-        let output = document.getElementById("image-preview-group");
-        output.innerHTML = ''
-        let mapping = selectedFiles.filter(item => {
-            let file = item.file
+
+        function deleteImage(index) {
+            const data = document.getElementById(`image_${index}`);
+            data.remove();
+            urls.splice(index, 1);
+            getImageUrl(urls)
+        }
+
+        getImageUrl(urls)
+        //add preview image url files
+
+
+        //Check File API support
+        function addPreviewFile(input) {
+            if (window.File && window.FileList && window.FileReader) {
+                if (input.files && input.files[0]) {
+                    previewFiles.push({
+                        id: previewFiles.length === 0 ? 0 : previewFiles[previewFiles.length - 1].id + 1,
+                        file: input.files[0]
+                    });
+                }
+            }
+            getPreviewFiles(previewFiles)
+        }
+
+        function getPreviewFiles(selectedFiles) {
+            let output = document.getElementById("image-preview-group");
+            output.innerHTML = ''
+            let mapping = selectedFiles.filter(item => {
+                let file = item.file
                 var picReader = new FileReader();
 
-                picReader.addEventListener("load",function(event){
+                picReader.addEventListener("load", function (event) {
 
                     var picFile = event.target;
 
@@ -194,87 +247,86 @@ div.desc {
                                             </a>
                                         </div>
                                     </div>`
-                    output.insertBefore(div,null);
+                    output.insertBefore(div, null);
                 });
-            picReader.readAsDataURL(file);
-        })
-    }
-    function deletePreviewImage(index) {
-        previewFiles = previewFiles.filter(item => item.id !== index)
-        getPreviewFiles(previewFiles)
-    }
+                picReader.readAsDataURL(file);
+            })
+        }
 
-    function submitFormData(){
-        swal({
-          title: "Are you sure?",
-          text: "Kiểm Tra Thông Tin Trước khi gửi",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((willDelete) => {
-          if (willDelete) {
-            var formData = new FormData();
-            const name = document.getElementById("input-name").value;
-            const price = document.getElementById("input-price").value;
-            const quantity = document.getElementById("input-quantity").value;
-            const slug = document.getElementById("input-slug").value;
-            const category = document.getElementById("input-category").value
-            formData.append("name", name);
-            formData.append("price", price);
-            formData.append("quantity", quantity);
-            formData.append("slug", slug);
-            formData.append("category_id", category);
-            if (urls.length > 0) {
-                formData.append("image_url", JSON.stringify(urls));
-            }
-            if (previewFiles.length > 0) {
-                previewFiles.forEach(item => {
-                    formData.append("files", item.file)
-                })
-            }
-            $.ajax({
-                type: "POST",
-                url: "{{url_for('product_management.product_detail', id_product = id_product)}}",
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function (data) {
-                    let objData = JSON.parse(data);
-                    let idProduct = parseInt(objData.id_product);
-                    if(idProduct){
-                        window.location= "/admin/product_management/"+idProduct;
-                    }
-                    else{
-                        swal(objData.message, {
-                          icon: "warning",
+        function deletePreviewImage(index) {
+            previewFiles = previewFiles.filter(item => item.id !== index)
+            getPreviewFiles(previewFiles)
+        }
+
+        function submitFormData() {
+            swal({
+                title: "Are you sure?",
+                text: "Kiểm Tra Thông Tin Trước khi gửi",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        var formData = new FormData();
+                        const name = document.getElementById("input-name").value;
+                        const price = document.getElementById("input-price").value;
+                        const old_price = document.getElementById("input-old_price").value;
+                        const slug = document.getElementById("input-slug").value;
+                        const category = document.getElementById("input-category").value
+                        const brand = document.getElementById("input-brand").value
+                        formData.append("name", name);
+                        formData.append("price", price);
+                        formData.append("old_price", old_price);
+                        formData.append("slug", slug);
+                        formData.append("category_id", category);
+                        formData.append("brand_id", brand);
+                        if (urls.length > 0) {
+                            formData.append("image_url", JSON.stringify(urls));
+                        }
+                        if (previewFiles.length > 0) {
+                            previewFiles.forEach(item => {
+                                formData.append("files", item.file)
+                            })
+                        }
+                        $.ajax({
+                            type: "POST",
+                            url: "{{url_for('product_management.product_detail', id_product = id_product)}}",
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            success: function (data) {
+                                let objData = JSON.parse(data);
+                                let idProduct = parseInt(objData.id_product);
+                                if (idProduct) {
+                                    window.location = "/admin/product_management/" + idProduct;
+                                } else {
+                                    swal(objData.message, {
+                                        icon: "warning",
+                                    });
+                                }
+                            },
+                            error: function (e) {
+                                document.body.innerHTML = e.responseText
+                            }
                         });
+                        return false;
+                    } else {
+                        return false;
                     }
-                },
-                error: function (e) {
-                    document.body.innerHTML = e.responseText
-                }
-            });
+                });
             return false;
-          } else {
-            return false;
-          }
-        });
-        return false;
-    }
-    function convertToSlug(Text)
-    {
-        const slug = document.getElementById("input-slug")
-        if (!Text) slug.value = ''
-        else slug.value =  Text.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'');
-    }
+        }
+
+        function convertToSlug(Text) {
+            const slug = document.getElementById("input-slug")
+            if (!Text) slug.value = ''
+            else slug.value = Text.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+        }
 
 
-
-
-
-</script>
-</div>
+    </script>
+    </div>
 
 {% endblock content %}
 

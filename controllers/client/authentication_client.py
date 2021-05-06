@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, url_for, redirect, session, reques
 from flask_sqlalchemy import SQLAlchemy
 from libs.user_permission import get_user_type_in_session
 from libs.constant import UserTypeEnum
-from models import User
+from models import User, Cart
 import json
 from libs.sql_action import safe_commit
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -64,6 +64,11 @@ def register():
         # else we can create the user
         new_user = User(email=email, username=username, password=generate_password_hash(password, method='sha256'))
         db.session.add(new_user)
+        db.session.commit()
+        cart = Cart(
+            user_id=new_user.id
+        )
+        db.session.add(cart)
         db.session.commit()
         return json.dumps({'success': True, 'message': 'Đăng Ký Thành Công'})
     else:

@@ -1,0 +1,429 @@
+{% extends 'layout/base-client.html' %}
+{% block body %}
+
+    <div class="container" style="min-height: 700px">
+        <ul class="nav nav-tabs nav-pills" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active show" href="#profile" role="tab" data-toggle="tab" aria-selected="true">Đơn
+                    Hàng Xử lí</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#buzz" role="tab" data-toggle="tab">Đơn Hàng Đang Giao</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#references" role="tab" data-toggle="tab">Đơn Hàng Đã Giao</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#references2" role="tab" data-toggle="tab">Đơn Hàng Đã Hủy</a>
+            </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active" id="profile">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="cart-table clearfix">
+                            <table class="table table-responsive">
+                                <thead>
+                                <tr>
+                                    <th>Đơn Hàng</th>
+                                    <th>Tên Người Mua</th>
+                                    <th>Địa Chỉ</th>
+                                    <th>Số Điện Thoại</th>
+                                    <th>Thành Tiền</th>
+                                    <th>Phí Shipping</th>
+                                    <th>Discount</th>
+                                    <th>Tổng Tiền</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for order_item in orders %}
+                                    {% if order_item.Transaction.status == 1 %}
+                                        <tr class="accordion-toggle" data-toggle="collapse"
+                                            data-target="#transaction-{{ order_item.Transaction.id }}">
+                                            <td class="stock_name"><span
+                                                    class="badge badge-primary">#{{ order_item.Transaction.id }} </span>
+                                            </td>
+                                            <td class="place_name">{{ order_item.Transaction.user_name }}</td>
+                                            <td class="price"><span>{{ order_item.Transaction.address }}</span></td>
+                                            <td class="price"><span>{{ order_item.Transaction.phone_number }}</span>
+                                            </td>
+                                            <td class="price"><span>{{ order_item.Transaction.subtotal | priceFormat }} VNĐ</span>
+                                            </td>
+                                            <td class="price">
+                                                <span>{{ order_item.Transaction.shipping_fee | priceFormat }} VNĐ</span>
+                                            </td>
+                                            <td><span
+                                                    class="badge badge-primary">{{ order_item.Transaction.discount }}%</span>
+                                            </td>
+                                            <td>
+                                                <span class="total_price"><strong>{{ order_item.Transaction.total | priceFormat }} VNĐ</strong></span>
+                                            </td>
+                                             <td class="text-center">
+                                                <div class="dropdown">
+                                                    <a class="btn btn-warning btn-icon-only text-light"
+                                                       href="#" role="button"
+                                                       data-toggle="dropdown" aria-haspopup="true"
+                                                       aria-expanded="false">
+                                                        <>
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+
+                                                        <a class="dropdown-item" id="{{ order_item.Transaction.id }}"
+                                                           onclick="cancelTransaction(this)">Hủy Đơn Hàng</a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            {% if order_item.order_products %}
+                                                <tr>
+                                                    <td colspan="12" class="hiddenRow">
+                                                        <div class="accordian-body collapse"
+                                                             id="transaction-{{ order_item.Transaction.id }}">
+                                                            <table class="table table-striped">
+                                                                <thead>
+                                                                <tr class="info">
+                                                                    <th>Kho</th>
+                                                                    <th>Tên Sản Phẩm</th>
+                                                                    <th>Giá</th>
+                                                                    <th>Số Lượng</th>
+                                                                    <th>Thành Tiền</th>
+                                                                </tr>
+                                                                </thead>
+
+                                                                <tbody>
+                                                                {% for order_product in order_item.order_products %}
+                                                                    <tr>
+                                                                        <td>{{ order_product.stock_name }}</td>
+                                                                        <td>{{ order_product.product_name }}</td>
+                                                                        <td>{{ order_product.product_price |priceFormat }}
+                                                                            VND
+                                                                        </td>
+                                                                        <td>{{ order_product.quantity }}</td>
+                                                                        <td>{{ (order_product.product_price|int * order_product.quantity |int) | priceFormat }}
+                                                                            VNĐ
+                                                                        </td>
+
+                                                                    </tr>
+                                                                {% endfor %}
+                                                                </tbody>
+                                                            </table>
+
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        </tr>
+                                    {% endif %}
+
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="buzz">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="cart-table clearfix">
+                            <table class="table table-responsive">
+                                <thead>
+                                <tr>
+                                    <th>Đơn Hàng</th>
+                                    <th>Tên Người Mua</th>
+                                    <th>Địa Chỉ</th>
+                                    <th>Số Điện Thoại</th>
+                                    <th>Thành Tiền</th>
+                                    <th>Phí Shipping</th>
+                                    <th>Discount</th>
+                                    <th>Tổng Tiền</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for order_item in orders %}
+                                    {% if order_item.Transaction.status == 2 %}
+                                        <tr class="accordion-toggle" data-toggle="collapse"
+                                            data-target="#transaction-{{ order_item.Transaction.id }}">
+                                            <td class="stock_name"><span
+                                                    class="badge badge-primary">#{{ order_item.Transaction.id }} </span>
+                                            </td>
+                                            <td class="place_name">{{ order_item.Transaction.user_name }}</td>
+                                            <td class="price"><span>{{ order_item.Transaction.address }}</span></td>
+                                            <td class="price"><span>{{ order_item.Transaction.phone_number }}</span>
+                                            </td>
+                                            <td class="price"><span>{{ order_item.Transaction.subtotal | priceFormat }} VNĐ</span>
+                                            </td>
+                                            <td class="price">
+                                                <span>{{ order_item.Transaction.shipping_fee | priceFormat }} VNĐ</span>
+                                            </td>
+                                            <td><span
+                                                    class="badge badge-primary">{{ order_item.Transaction.discount }}%</span>
+                                            </td>
+                                            <td>
+                                                <span class="total_price"><strong>{{ order_item.Transaction.total | priceFormat }} VNĐ</strong></span>
+                                            </td>
+
+                                            {% if order_item.order_products %}
+                                                <tr>
+                                                    <td colspan="12" class="hiddenRow">
+                                                        <div class="accordian-body collapse"
+                                                             id="transaction-{{ order_item.Transaction.id }}">
+                                                            <table class="table table-striped">
+                                                                <thead>
+                                                                <tr class="info">
+                                                                    <th>Kho</th>
+                                                                    <th>Tên Sản Phẩm</th>
+                                                                    <th>Giá</th>
+                                                                    <th>Số Lượng</th>
+                                                                    <th>Thành Tiền</th>
+                                                                </tr>
+                                                                </thead>
+
+                                                                <tbody>
+                                                                {% for order_product in order_item.order_products %}
+                                                                    <tr>
+                                                                        <td>{{ order_product.stock_name }}</td>
+                                                                        <td>{{ order_product.product_name }}</td>
+                                                                        <td>{{ order_product.product_price |priceFormat }}
+                                                                            VND
+                                                                        </td>
+                                                                        <td>{{ order_product.quantity }}</td>
+                                                                        <td>{{ (order_product.product_price|int * order_product.quantity |int) | priceFormat }}
+                                                                            VNĐ
+                                                                        </td>
+
+                                                                    </tr>
+                                                                {% endfor %}
+                                                                </tbody>
+                                                            </table>
+
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="references">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="cart-table clearfix">
+                            <table class="table table-responsive">
+                                <thead>
+                                <tr>
+                                    <th>Đơn Hàng</th>
+                                    <th>Tên Người Mua</th>
+                                    <th>Địa Chỉ</th>
+                                    <th>Số Điện Thoại</th>
+                                    <th>Thành Tiền</th>
+                                    <th>Phí Shipping</th>
+                                    <th>Discount</th>
+                                    <th>Tổng Tiền</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for order_item in orders %}
+                                    {% if order_item.Transaction.status == 3 %}
+                                        <tr class="accordion-toggle" data-toggle="collapse"
+                                            data-target="#transaction-{{ order_item.Transaction.id }}">
+                                            <td class="stock_name"><span
+                                                    class="badge badge-primary">#{{ order_item.Transaction.id }} </span>
+                                            </td>
+                                            <td class="place_name">{{ order_item.Transaction.user_name }}</td>
+                                            <td class="price"><span>{{ order_item.Transaction.address }}</span></td>
+                                            <td class="price"><span>{{ order_item.Transaction.phone_number }}</span>
+                                            </td>
+                                            <td class="price"><span>{{ order_item.Transaction.subtotal | priceFormat }} VNĐ</span>
+                                            </td>
+                                            <td class="price">
+                                                <span>{{ order_item.Transaction.shipping_fee | priceFormat }} VNĐ</span>
+                                            </td>
+                                            <td><span
+                                                    class="badge badge-primary">{{ order_item.Transaction.discount }}%</span>
+                                            </td>
+                                            <td>
+                                                <span class="total_price"><strong>{{ order_item.Transaction.total | priceFormat }} VNĐ</strong></span>
+                                            </td>
+                                            {% if order_item.order_products %}
+                                                <tr>
+                                                    <td colspan="12" class="hiddenRow">
+                                                        <div class="accordian-body collapse"
+                                                             id="transaction-{{ order_item.Transaction.id }}">
+                                                            <table class="table table-striped">
+                                                                <thead>
+                                                                <tr class="info">
+                                                                    <th>Kho</th>
+                                                                    <th>Tên Sản Phẩm</th>
+                                                                    <th>Giá</th>
+                                                                    <th>Số Lượng</th>
+                                                                    <th>Thành Tiền</th>
+                                                                </tr>
+                                                                </thead>
+
+                                                                <tbody>
+                                                                {% for order_product in order_item.order_products %}
+                                                                    <tr>
+                                                                        <td>{{ order_product.stock_name }}</td>
+                                                                        <td>{{ order_product.product_name }}</td>
+                                                                        <td>{{ order_product.product_price |priceFormat }}
+                                                                            VND
+                                                                        </td>
+                                                                        <td>{{ order_product.quantity }}</td>
+                                                                        <td>{{ (order_product.product_price|int * order_product.quantity |int) | priceFormat }}
+                                                                            VNĐ
+                                                                        </td>
+
+                                                                    </tr>
+                                                                {% endfor %}
+                                                                </tbody>
+                                                            </table>
+
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        </tr>
+                                    {% endif %}
+
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="references2">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="cart-table clearfix">
+                            <table class="table table-responsive">
+                                <thead>
+                                <tr>
+                                    <th>Đơn Hàng</th>
+                                    <th>Tên Người Mua</th>
+                                    <th>Địa Chỉ</th>
+                                    <th>Số Điện Thoại</th>
+                                    <th>Thành Tiền</th>
+                                    <th>Phí Shipping</th>
+                                    <th>Discount</th>
+                                    <th>Tổng Tiền</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for order_item in orders %}
+                                    {% if order_item.Transaction.status == 4 %}
+                                        <tr class="accordion-toggle" data-toggle="collapse"
+                                            data-target="#transaction-{{ order_item.Transaction.id }}">
+                                            <td class="stock_name"><span
+                                                    class="badge badge-primary">#{{ order_item.Transaction.id }} </span>
+                                            </td>
+                                            <td class="place_name">{{ order_item.Transaction.user_name }}</td>
+                                            <td class="price"><span>{{ order_item.Transaction.address }}</span></td>
+                                            <td class="price"><span>{{ order_item.Transaction.phone_number }}</span>
+                                            </td>
+                                            <td class="price"><span>{{ order_item.Transaction.subtotal | priceFormat }} VNĐ</span>
+                                            </td>
+                                            <td class="price">
+                                                <span>{{ order_item.Transaction.shipping_fee | priceFormat }} VNĐ</span>
+                                            </td>
+                                            <td><span
+                                                    class="badge badge-primary">{{ order_item.Transaction.discount }}%</span>
+                                            </td>
+                                            <td>
+                                                <span class="total_price"><strong>{{ order_item.Transaction.total | priceFormat }} VNĐ</strong></span>
+                                            </td>
+                                            {% if order_item.order_products %}
+                                                <tr>
+                                                    <td colspan="12" class="hiddenRow">
+                                                        <div class="accordian-body collapse"
+                                                             id="transaction-{{ order_item.Transaction.id }}">
+                                                            <table class="table table-striped">
+                                                                <thead>
+                                                                <tr class="info">
+                                                                    <th>Kho</th>
+                                                                    <th>Tên Sản Phẩm</th>
+                                                                    <th>Giá</th>
+                                                                    <th>Số Lượng</th>
+                                                                    <th>Thành Tiền</th>
+                                                                </tr>
+                                                                </thead>
+
+                                                                <tbody>
+                                                                {% for order_product in order_item.order_products %}
+                                                                    <tr>
+                                                                        <td>{{ order_product.stock_name }}</td>
+                                                                        <td>{{ order_product.product_name }}</td>
+                                                                        <td>{{ order_product.product_price |priceFormat }}
+                                                                            VND
+                                                                        </td>
+                                                                        <td>{{ order_product.quantity }}</td>
+                                                                        <td>{{ (order_product.product_price|int * order_product.quantity |int) | priceFormat }}
+                                                                            VNĐ
+                                                                        </td>
+
+                                                                    </tr>
+                                                                {% endfor %}
+                                                                </tbody>
+                                                            </table>
+
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function cancelTransaction(obj) {
+        let idTransaction = obj.id;
+                swal({
+                    title: "Are you sure?",
+                    text: "Bạn Có Chắc Chắn muốn hủy đơn hàng ? Không thể Hoàn tác",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            $.ajax({
+                                type: "POST",
+                                url: "/cancel_order/" + idTransaction,
+                                success: function (data) {
+                                    swal(data, {
+                                        icon: "success",
+                                    }).then(() => {
+                                        location.reload()
+                                    });
+                                },
+                                error: function (e) {
+                                    swal(e.responseText);
+                                }
+                            });
+                        } else {
+                        }
+                    });
+    }
+    </script>
+
+{% endblock %}

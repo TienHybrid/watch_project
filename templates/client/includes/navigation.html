@@ -44,15 +44,15 @@
                                                                        class="cart-thumb" alt=""></a>
                                         <div class="cart-item-desc">
                                             <h6><a href="{{ url_for('product.product_detail', id_product= cart_item.product_id) }}">{{ cart_item.product_name }}</a></h6>
-                                            <p>SL:{{ cart_item.quantity }} - <span class="price">{{ cart_item.product_price | priceFormat }} VND</span></p>
+                                            <p>SL: {{ cart_item.quantity }} - Giá :<span class="price">{{( cart_item.product_price | int * cart_item.quantity | int ) | priceFormat  }} VND</span></p>
                                         </div>
                                         <span class="dropdown-product-remove"><i class="icon-cross"></i></span>
                                     </li>
                                     {% endfor %}
                                     <li class="total">
 {#                                        <span class="pull-right">Total: $20.00</span>#}
-                                        <a href="{{ url_for('cart.cart') }}" class="btn btn-sm btn-cart">Cart</a>
-                                        <a href="{{ url_for('cart.checkout') }}" class="btn btn-sm btn-checkout">Checkout</a>
+                                        <a href="{{ url_for('cart.cart') }}" class="btn btn-sm btn-cart">Giỏ Hàng</a>
+                                        <a href="{{ url_for('order.checkout') }}" class="btn btn-sm btn-checkout">Mua Hàng</a>
                                     </li>
                                 </ul>
                             </div>
@@ -67,7 +67,7 @@
                                     </button>
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item" href="{{ url_for('main.profile') }}">Profile</a>
-                                        <a class="dropdown-item" href="{{ url_for('cart.cart') }}">Đơn Hàng</a>
+                                        <a class="dropdown-item" href="{{ url_for('order.order') }}">Đơn Hàng</a>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="{{ url_for('authentication_client.logout') }}">Đăng
                                             Xuất</a>
@@ -118,8 +118,20 @@
                                         </div>
                                     </li>
 
-                                    <li class="nav-item"><a class="nav-link" href="#"><span
-                                            class="karl-level">hot</span> Khuyến Mại</a></li>
+                                <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="karlDropdown" role="button"
+                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Thương Hiệu</a>
+                                        <div class="dropdown-menu" aria-labelledby="karlDropdown">
+                                            {% for brand in g.brands %}
+                                            <a class="dropdown-item"
+                                               href="{{ url_for('product.product', id_brand = brand.id) }}">
+                                                {{ brand.name }}
+                                            </a>
+                                           {% endfor %}
+                                        </div>
+                                    </li>
+{#                                    <li class="nav-item"><a class="nav-link" href="#"><span#}
+{#                                            class="karl-level">hot</span> Khuyến Mại</a></li>#}
                                 </ul>
                             </div>
                         </nav>

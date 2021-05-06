@@ -14,6 +14,15 @@
             pointer-events: none !important;
             cursor: default !important;
         }
+
+        .percent-price {
+            width: 50px;
+            height: 50px;
+            background-color: red;
+        }
+
+        }
+
     </style>
 
     <section class="shop_grid_area section_padding_100">
@@ -26,29 +35,31 @@
                                   method="get"
                                   action="{{ url_for('product.product',
                                         page=products.prev_num,
+                                        id_brand=request.args.get('id_brand'),
                                         id_price=request.args.get('id_price'),
                                         id_category=request.args.get('id_category'),
                                         search=request.args.get('search')
-                                          )}}">
+                                          ) }}">
                                 <div class="input-group input-group-alternative input-group-merge">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa fa-search"></i></span>
                                     </div>
                                     <input class="form-control"
                                            value="{{ none_to_empty_string(request.args.get('search')) }}"
-                                            placeholder="Tìm Kiếm..." name="search" type="text">
+                                           placeholder="Tìm Kiếm..." name="search" type="text">
                                 </div>
                             </form>
                         </div>
                         <div class="widget catagory mb-50">
                             <!--  Side Nav  -->
                             <div class="nav-side-menu">
-                                <h6 class="mb-0">Catagories</h6>
+                                <h6 class="mb-0">Thế Loại</h6>
                                 <div class="menu-list">
                                     <ul class="menu-content">
                                         <li>
                                             <a href="{{ url_for('product.product',
                                         page=products.prev_num,
+                                        id_brand=request.args.get('id_brand'),
                                         id_price=request.args.get('id_price'),
                                         id_category=None,
                                         search=request.args.get('search')) }}"
@@ -63,6 +74,7 @@
                                             <li>
                                                 <a href="{{ url_for('product.product',
                                         page=products.prev_num,
+                                        id_brand=request.args.get('id_brand'),
                                         id_price=request.args.get('id_price'),
                                         id_category=category.id,
                                         search=request.args.get('search')) }}"
@@ -77,14 +89,53 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="widget catagory mb-50">
+                            <!--  Side Nav  -->
+                            <div class="nav-side-menu">
+                                <h6 class="mb-0">Thương Hiệu</h6>
+                                <div class="menu-list">
+                                    <ul class="menu-content">
+                                        <li>
+                                            <a href="{{ url_for('product.product',
+                                        page=products.prev_num,
+                                        id_price=request.args.get('id_price'),
+                                        id_category=request.args.get('id_category'),
+                                        id_brand=None,
+                                        search=request.args.get('search')) }}"
+                                                    {% if not request.args.get('id_brand') %}
+                                               class="active-cat"
+                                                    {% endif %}
+                                            >Tất Cả</a>
+                                        </li>
+                                        <!-- Single Item -->
+                                        {% set id_cat = request.args.get('id_brand') %}
+                                        {% for brand in g.brands %}
+                                            <li>
+                                                <a href="{{ url_for('product.product',
+                                        page=products.prev_num,
+                                        id_price=request.args.get('id_price'),
+                                        id_category=request.args.get('id_category'),
+                                        id_brand=brand.id,
+                                        search=request.args.get('search')) }}"
 
+                                                        {% if brand.id |string() == id_cat|string() %}
+                                                   class="active-cat disabled-tag"
+                                                        {% endif %}
+                                                >{{ brand.name }}</a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                         <div class="widget price mb-50">
-                            <h6 class="widget-title mb-30">Filter by Price</h6>
+                            <h6 class="widget-title mb-30">Sắp xếp Theo Giá</h6>
                             <div class="menu-list">
                                 <ul class="menu-content">
                                     <li><a href="{{ url_for('product.product',
                                         page=products.prev_num,
                                         id_price=None,
+                                         id_brand=request.args.get('id_brand'),
                                         id_category=request.args.get('id_category'),
                                         search=request.args.get('search')) }}"
                                             {% if not request.args.get('id_price') %}
@@ -98,6 +149,7 @@
                                             <a href="{{ url_for('product.product',
                                         page=products.prev_num,
                                         id_price=price.id,
+                                        id_brand=request.args.get('id_brand'),
                                         id_category=request.args.get('id_category'),
                                         search=request.args.get('search')) }}"
                                                     {% if price.id|string() == request.args.get('id_price')|string() %}
@@ -123,53 +175,36 @@
                             <!--                        </div>-->
                         </div>
                         <div class="widget recommended">
-                            <h6 class="widget-title mb-30">Recommended</h6>
+                            <h6 class="widget-title mb-30">Sản Phâm Mới</h6>
 
                             <div class="widget-desc">
+                                {% for newest_product in newest_products %}
                                 <!-- Single Recommended Product -->
                                 <div class="single-recommended-product d-flex mb-30">
                                     <div class="single-recommended-thumb mr-3">
-                                        <img alt="" src="static/client/assets/img/product-img/product-10.jpg">
+                                        <img alt="" src="{{ newest_product.image_url[0] }}">
                                     </div>
                                     <div class="single-recommended-desc">
-                                        <h6>Men’s T-shirt</h6>
-                                        <p>$ 39.99</p>
+                                         <a href="{{ url_for('product.product_detail', id_product = newest_product.id) }}">
+                                             {{ newest_product.name }}</a>
+                                        <p>{{ newest_product.price | priceFormat }} VND</p>
                                     </div>
                                 </div>
-                                <!-- Single Recommended Product -->
-                                <div class="single-recommended-product d-flex mb-30">
-                                    <div class="single-recommended-thumb mr-3">
-                                        <img alt="" src="static/client/assets/img/product-img/product-11.jpg">
-                                    </div>
-                                    <div class="single-recommended-desc">
-                                        <h6>Blue mini top</h6>
-                                        <p>$ 19.99</p>
-                                    </div>
-                                </div>
-                                <!-- Single Recommended Product -->
-                                <div class="single-recommended-product d-flex">
-                                    <div class="single-recommended-thumb mr-3">
-                                        <img alt="" src="static/client/assets/img/product-img/product-12.jpg">
-                                    </div>
-                                    <div class="single-recommended-desc">
-                                        <h6>Women’s T-shirt</h6>
-                                        <p>$ 39.99</p>
-                                    </div>
-                                </div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-12 col-md-8 col-lg-9">
-                {% if filters %}
-                    Danh Sách Phân Loại:
-                    {% for filter in filters %}
-                    <a href="#">
-                    <span class="badge badge-danger">{{ filter.value }} &times;</span>
-                    </a>
-                    {% endfor %}
-                {% endif %}
+                    {% if filters %}
+                        Danh Sách Phân Loại:
+                        {% for filter in filters %}
+                            <a href="#">
+                                <span class="badge badge-danger">{{ filter.value }} &times;</span>
+                            </a>
+                        {% endfor %}
+                    {% endif %}
                     <div class="shop_grid_product_area">
                         <div class="row">
                             {% for product in products.items %}
@@ -186,13 +221,30 @@
                                      id_product = product.id) }}"><i
                                                     class="fa fa-eye"></i></a>
                                         </div>
+
                                     </div>
                                     <!-- Product Description -->
-                                    <div class="product-description">
-                                        <h4 class="product-price">{{ product.price | priceFormat }} VND</h4>
-                                        <p>{{ product.name }}</p>
+                                    <div class="product-description">'
+                                        <div>
+                                            <h4 class="product-price">{{ product.price | priceFormat }} VND</h4>
+                                            <span class="badge badge-pill badge-danger">{{ product.down_price }}%</span>
+                                        </div>
+
+                                        {% if product.old_price %}
+                                            <p class="product-price"
+                                               style="text-decoration: line-through;color: red;">
+                                                {{ product.old_price | priceFormat }}
+                                                VND</p>
+                                        {% endif %}
+                                        <h5>{{ product.name }}</h5>
                                         <!-- Add to Cart -->
-                                        <a class="add-to-cart-btn" href="#">ADD TO CART</a>
+                                        <form action="{{ url_for('cart.add_cart') }}" method="POST">
+                                            <input type="hidden" name="product_id" value="{{ product.id }}"/>
+                                            <input type="hidden" name="stock_id" value="{{ product.stock_id }}"/>
+                                            <input type="hidden" name="quantity" value="1"/>
+                                            <a href="#" onclick="this.parentNode.submit()" class="add-to-cart-btn">Thêm
+                                                Vào Giỏ Hàng</a>
+                                        </form>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -207,6 +259,7 @@
                                     <a class="page-link"
                                        href="{{ url_for('product.product',
                                    id_price=request.args.get('id_price'),
+                                   id_brand=request.args.get('id_brand'),
                                    id_category=request.args.get('id_category'),
                                    page=products.prev_num,
                                    search=request.args.get('search')) }}">
@@ -224,6 +277,7 @@
                                                 <a class="page-link"
                                                    href="{{ url_for('product.product',
                                    id_category=request.args.get('id_category'),
+                                   id_brand=request.args.get('id_brand'),
                                    id_price=request.args.get('id_price'),
                                    page=page_num,
                                     search=request.args.get('search')) }}">
@@ -236,6 +290,7 @@
                                 <li class="page-item ">
                                     <a class="page-link {% if not products.next_num %}disabled{% endif %}"
                                        href="{{ url_for('product.product',
+                                       id_brand=request.args.get('id_brand'),
                                    id_category=request.args.get('id_category'),
                                    page=products.next_num,
                                    id_price=request.args.get('id_price'),
@@ -252,5 +307,4 @@
             </div>
         </div>
     </section>
-
 {% endblock body %}

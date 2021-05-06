@@ -1,0 +1,334 @@
+{% extends 'layouts/base-admin.html' %}
+
+{% block title %} Tables {% endblock title %}
+
+{% block content %}
+    <style>
+        .image-icon {
+            width: 100%;
+            height: 100%;
+            object-fit: cover !important;
+        }
+    </style>
+    <div class="header bg-primary pb-6">
+        <div class="container-fluid">
+            <div class="header-body">
+                <div class="row align-items-center py-4">
+                    <div class="col-lg-6 col-7">
+                        <h6 class="h2 text-white d-inline-block mb-0">Tables</h6>
+                        <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                                <li class="breadcrumb-item"><a href="{{ url_for('admin.admin') }}"><i
+                                        class="fas fa-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="{{ url_for('admin.admin') }}">Admin</a></li>
+                                <li class="breadcrumb-item active">Đơn Hàng</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    {#                <div class="col-lg-6 col-5 text-right">#}
+                    {#                    <a href="{{url_for('order_management.category_detail', id_category = 'add')}}"#}
+                    {#                       class="btn btn-sm btn-neutral">New</a>#}
+                    {#                    <a href="#" class="btn btn-sm btn-neutral">Filters</a>#}
+                    {#                </div>#}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="container-fluid mt--6">
+        <form class="navbar-search navbar-search-light form-inline mr-sm-3 mb-3"
+              method="get">
+            <div class="form-group mb-0">
+                <div class="input-group input-group-alternative input-group-merge">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    </div>
+                    <input class="form-control" placeholder="Search" name="search" type="text">
+                </div>
+            </div>
+            <button type="button" class="close" data-action="search-close" data-target="#navbar-search-main"
+                    aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </form>
+        <div class="row">
+            <div class="col">
+
+                <!-- Nav tabs -->
+                <ul class="mt-3 nav nav-tabs">
+                    {% for list_status_item in list_status %}
+                        <li class="nav-item">
+                            <a    {% if loop.index0 == 0 %}
+                                class="nav-link active"
+                            {% else %}
+                                class="nav-link"
+                            {% endif %}
+                                data-toggle="tab"
+                                href="#status-{{ list_status_item.id }}">
+                                {{ list_status_item.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <!-- Tab panes -->
+
+                <div class="tab-content">
+                    {% for list_status_item in list_status %}
+                        <div id="status-{{ list_status_item.id }}"
+                                {% if loop.index0 == 0 %}
+                             class=" tab-pane active"
+                                {% else %}
+                             class=" tab-pane"
+                                {% endif %}
+                        >
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="cart-table clearfix">
+                                        <table class="table table-responsive">
+                                            <thead>
+                                            <tr>
+                                                <th>Đơn Hàng</th>
+                                                <th>Tên Người Mua</th>
+                                                <th>Địa Chỉ</th>
+                                                <th>Số Điện Thoại</th>
+                                                <th>Thành Tiền</th>
+                                                <th>Phí Shipping</th>
+                                                <th>Discount</th>
+                                                <th>Tổng Tiền</th>
+                                                <th></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for order_item in orders %}
+                                                {% if order_item.Transaction.status == list_status_item.id %}
+                                                    <tr class="accordion-toggle" data-toggle="collapse"
+                                                        data-target="#transaction-{{ order_item.Transaction.id }}">
+                                                        <td class="stock_name"><span
+                                                                class="badge badge-primary">#{{ order_item.Transaction.id }} </span>
+                                                        </td>
+                                                        <td class="place_name">{{ order_item.Transaction.user_name }}</td>
+                                                        <td class="price">
+                                                            <span>{{ order_item.Transaction.address }}</span></td>
+                                                        <td class="price">
+                                                            <span>{{ order_item.Transaction.phone_number }}</span>
+                                                        </td>
+                                                        <td class="price">
+                                                            <span>{{ order_item.Transaction.subtotal | priceFormat }} VNĐ</span>
+                                                        </td>
+                                                        <td class="price">
+                                                            <span>{{ order_item.Transaction.shipping_fee | priceFormat }} VNĐ</span>
+                                                        </td>
+                                                        <td><span
+                                                                class="badge badge-primary">{{ order_item.Transaction.discount }}%</span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="total_price"><strong>{{ order_item.Transaction.total | priceFormat }} VNĐ</strong></span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div class="dropdown">
+                                                                <a class="btn btn-sm btn-icon-only text-light"
+                                                                   href="#" role="button"
+                                                                   data-toggle="dropdown" aria-haspopup="true"
+                                                                   aria-expanded="false">
+                                                                    <i class="fas fa-ellipsis-v"></i>
+                                                                </a>
+                                                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                                    {% if list_status_item.id == 1 %}
+                                                                        <a class="dropdown-item"
+                                                                           id="{{ order_item.Transaction.id }}"
+                                                                           onclick="confirmTransaction(this, {{ list_status_item.id | int }})"
+                                                                        >Duyệt Đơn</a>
+                                                                    {% endif %}
+
+                                                                    <a class="dropdown-item" data-target="#modal-form"
+                                                                       data-toggle="modal"
+                                                                       id="{{ order_item.Transaction.id }}"
+                                                                       onclick="openModalEdit(this, {{ list_status_item.id }})"
+                                                                    >Chuyển Đơn Hàng</a>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        {% if order_item.order_products %}
+                                                            <tr>
+                                                                <td colspan="12" class="hiddenRow">
+                                                                    <div class="accordian-body collapse"
+                                                                         id="transaction-{{ order_item.Transaction.id }}">
+                                                                        <table class="table table-striped">
+                                                                            <thead>
+                                                                            <tr class="info">
+                                                                                <th>Kho</th>
+                                                                                <th>Tên Sản Phẩm</th>
+                                                                                <th>Giá</th>
+                                                                                <th>Số Lượng</th>
+                                                                                <th>Thành Tiền</th>
+                                                                                <th></th>
+                                                                            </tr>
+                                                                            </thead>
+
+                                                                            <tbody>
+                                                                            {% for order_product in order_item.order_products %}
+                                                                                <tr>
+                                                                                    <td>{{ order_product.stock_name }}</td>
+                                                                                    <td>{{ order_product.product_name }}</td>
+                                                                                    <td>{{ order_product.product_price |priceFormat }}
+                                                                                        VND
+                                                                                    </td>
+                                                                                    <td>{{ order_product.quantity }}</td>
+                                                                                    <td>{{ (order_product.product_price|int * order_product.quantity |int) | priceFormat }}
+                                                                                        VNĐ
+                                                                                    </td>
+                                                                                {% if list_status_item.id == 3 %}
+                                                                                    <td class="text-center">
+                                                                                        <div class="dropdown">
+                                                                                            <a class="btn btn-sm btn-icon-only text-light"
+                                                                                               href="#" role="button"
+                                                                                               data-toggle="dropdown"
+                                                                                               aria-haspopup="true"
+                                                                                               aria-expanded="false">
+                                                                                                <i class="fas fa-ellipsis-v"></i>
+                                                                                            </a>
+                                                                                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+
+                                                                                                    <a class="dropdown-item"
+                                                                                                       href="{{url_for('order_management.guarantee_info', id_transaction_product = order_product.id)}}"
+                                                                                                    >Xem Bảo Hành</a>
+
+
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                {% endif %}
+                                                                                </tr>
+                                                                            {% endfor %}
+                                                                            </tbody>
+                                                                        </table>
+
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        {% endif %}
+                                                    </tr>
+                                                {% endif %}
+
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+        {#    modal#}
+        <div class="col-8">
+            <div aria-hidden="true" aria-labelledby="modal-form" class="modal fade" id="modal-form" role="dialog"
+                 tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+                    <div class="modal-content ">
+                        <div class="modal-body p-0">
+                            <div class="card bg-secondary shadow border-0">
+                                <div class="card-header bg-transparent pb-5">
+                                    <div class="text-muted text-center mt-2 mb-3"><small>Chuyển Đổi Đơn Hàng</small>
+                                    </div>
+                                </div>
+                                <div class="card-body px-lg-5 py-lg-5">
+                                    <form method="post" onsubmit="return submitForm()" enctype="multipart/form-data">
+                                        <div class="row">
+                                            <input type="hidden" id="transaction_id">
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <label for="input-product">Sản Phẩm</label>
+                                                    <select class="form-control" id="transaction_status">
+                                                        {% for status in list_status %}
+                                                            <option value="{{ status.id }}">
+                                                                {{ status.name }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-center">
+                                            <a class="btn btn-sm "
+                                               class="close" data-dismiss="modal"
+                                            >Hủy Bỏ</a>
+                                            <button class="btn btn-sm btn-primary" type="submit">Save</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            function confirmTransaction(obj) {
+                const idTransaction = obj.id
+                swal({
+                    title: "Are you sure?",
+                    text: "Xác Nhận Giao Đơn Hàng",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            $.ajax({
+                                type: "POST",
+                                url: `/admin/change_status/` + idTransaction + "/" + 2,
+                                success: function (data) {
+                                    swal(data, {
+                                        icon: "success",
+                                    }).then(
+                                        window.location.reload()
+                                    )
+                                },
+                                error: function (e) {
+                                    swal(e.responseText);
+                                }
+                            });
+                        } else {
+                        }
+                    });
+            }
+
+            function openModalEdit(obj, status_id) {
+                $('#transaction_id').val(obj.id)
+                $(`#transaction_status`).val(status_id)
+            }
+
+            function submitForm() {
+                const transaction_id = $('#transaction_id').val()
+                const transaction_status = $('#transaction_status').val()
+                $.ajax({
+                    type: "POST",
+                    url: `/admin/change_status/${Number(transaction_id)}/${Number(transaction_status)}`,
+                    success: function (data) {
+                        swal(data, {
+                            icon: "success",
+                        }).then(
+                            window.location.reload()
+                        )
+                    },
+                    error: function (e) {
+                        swal(e.responseText);
+                    }
+                });
+
+            }
+        </script>
+
+
+    </div>
+{% endblock content %}
+
+

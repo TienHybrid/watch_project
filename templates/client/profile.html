@@ -199,6 +199,27 @@
                                 {{none_to_empty_string(current_user.address)}}
                             </div>
                         </div>
+                                            <hr>
+
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Thành Phố</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <select class="form-control" id="user_place_id" required disabled>
+                                        <option selected> Vui Lòng Chọn Thành Phố</option>
+                                            {% for place in g.list_place %}
+                                                <option
+                                                        {% if current_user.place_id == place.id %}
+                                                            selected
+                                                        {% endif %}
+                                                            value="{{ place.id }}">
+                                                    {{ place.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -234,10 +255,26 @@
                                         <input type="text" class="form-control" id="fullname"
                                                value="{{none_to_empty_string(current_user.fullname)}}">
                                     </div>
+
                                     <div class="col-12 mb-3">
                                         <label for="address">Địa Chỉ <span>*</span></label>
                                         <input type="text" class="form-control mb-3" id="address"
                                                value="{{none_to_empty_string(current_user.address)}}">
+                                    </div>
+                                     <div class="col-12 mb-3">
+                                        <label for="fullname">Thành Phố</label>
+                                        <select class="form-control" id="user_place_id" required>
+                                        <option selected> Vui Lòng Chọn Thành Phố</option>
+                                            {% for place in g.list_place %}
+                                                <option
+                                                        {% if current_user.place_id == place.id %}
+                                                            selected
+                                                        {% endif %}
+                                                            value="{{ place.id }}">
+                                                    {{ place.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
                                     </div>
                                     <div class="col-12 mb-3">
                                         <label for="phonenumber">Số Điện Thoại <span>*</span></label>
@@ -349,16 +386,15 @@
             const email = document.getElementById("email").value;
             const fullname = document.getElementById("fullname").value;
             const phonenumber = document.getElementById("phonenumber").value;
-
+            const place_id = document.getElementById("user_place_id").value;
             const file = document.getElementById("ipAvatarId").files[0];
             const address = document.getElementById("address").value;
-
             formData.append("username", username);
             formData.append("email", email);
             formData.append("fullname", fullname);
             formData.append("address", address);
             formData.append("phone_number", phonenumber);
-
+            formData.append("place_id", place_id);
             if(file){
                 formData.append("file", file);
             }

@@ -17,6 +17,7 @@ STAFF_FOLDER = 'staff'
 USER_FOLDER = 'User'
 CATEGORY_FOLDER = 'Category'
 PRODUCT_FOLDER = 'Product'
+BRAND_FOLDER = 'Brand'
 
 FILTER_PRICE = [
     {"id": 1, "name": "Duới 1 Triệu", "start": None, "end": 1000000},
@@ -27,3 +28,16 @@ FILTER_PRICE = [
 ]
 
 VOUCHER_TYPE = ['user', 'all_user']
+
+NO_BRAND_ID = 1
+
+SHIPPING_FEE = 30000
+
+PRICE_LIMIT = 1000000
+
+ORDER_STATUS = [
+    {"id": 1, "name": "Đang Chờ Xử Lí"},
+    {"id": 2, "name": "Đang Giao"},
+    {"id": 3, "name": "Đã Giao"},
+    {"id": 4, "name": "Đã Hủy"},
+]

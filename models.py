@@ -1,10 +1,9 @@
 # coding: utf-8
-from sqlalchemy import ARRAY, Boolean, Column, DateTime, \
-    ForeignKey, Integer, MetaData, SmallInteger, String, Text, \
-    INTEGER, VARCHAR
+from sqlalchemy import ARRAY, Boolean, Column, DateTime, ForeignKey, Integer, MetaData, SmallInteger, String, Text, INTEGER, VARCHAR
 from sqlalchemy.schema import FetchedValue
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 Base = declarative_base()
@@ -26,10 +25,15 @@ class Transaction(Base):
     shipping_method = Column(SmallInteger, nullable=False, server_default=FetchedValue())
     created_at = Column(DateTime, nullable=False, server_default=FetchedValue())
     updated_at = Column(DateTime, nullable=False, server_default=FetchedValue())
-    totalprice = Column(Integer, nullable=False, server_default=FetchedValue())
     is_deleted = Column(Boolean, nullable=False, server_default=FetchedValue())
+    voucher_id = Column(ForeignKey('voucher.id'))
+    discount = Column(Integer, server_default=FetchedValue())
+    shipping_fee = Column(Integer, server_default=FetchedValue())
+    subtotal = Column(Integer, server_default=FetchedValue())
+    total = Column(Integer, server_default=FetchedValue())
 
     user = relationship('User', primaryjoin='Transaction.user_id == User.id', backref='transactions')
+    voucher = relationship('Voucher', primaryjoin='Transaction.voucher_id == Voucher.id', backref='transactions')
 
 
 
@@ -47,7 +51,21 @@ class User(Base):
     created_at = Column(DateTime, nullable=False, server_default=FetchedValue())
     updated_at = Column(DateTime, server_default=FetchedValue())
     is_deleted = Column(Boolean, nullable=False, server_default=FetchedValue())
-    voucher = Column(ARRAY(INTEGER()), server_default=FetchedValue())
+    place_id = Column(ForeignKey('placemaster.id'))
+
+    place = relationship('Placemaster', primaryjoin='User.place_id == Placemaster.id', backref='users')
+
+
+
+class Brand(Base):
+    __tablename__ = 'brand'
+
+    id = Column(Integer, primary_key=True, server_default=FetchedValue())
+    name = Column(String(60), nullable=False)
+    image_url = Column(String)
+    created_at = Column(DateTime, nullable=False, server_default=FetchedValue())
+    updated_at = Column(DateTime, server_default=FetchedValue())
+    is_deleted = Column(Boolean, nullable=False, server_default=FetchedValue())
 
 
 
@@ -56,16 +74,8 @@ class Cart(Base):
 
     id = Column(Integer, primary_key=True, server_default=FetchedValue())
     user_id = Column(ForeignKey('User.id'), nullable=False)
-    user_name = Column(String(60), nullable=False, server_default=FetchedValue())
-    email = Column(String(60), nullable=False, server_default=FetchedValue())
-    phone_number = Column(String(11), nullable=False, server_default=FetchedValue())
-    address = Column(Text, nullable=False, server_default=FetchedValue())
-    content = Column(Text, nullable=False, server_default=FetchedValue())
-    status = Column(Integer, nullable=False, server_default=FetchedValue())
-    shipping_method = Column(SmallInteger, nullable=False, server_default=FetchedValue())
     created_at = Column(DateTime, nullable=False, server_default=FetchedValue())
     updated_at = Column(DateTime, nullable=False, server_default=FetchedValue())
-    totalprice = Column(Integer, nullable=False, server_default=FetchedValue())
     is_deleted = Column(Boolean, nullable=False, server_default=FetchedValue())
 
     user = relationship('User', primaryjoin='Cart.user_id == User.id', backref='carts')
@@ -80,7 +90,6 @@ class Cartproduct(Base):
     cart_id = Column(ForeignKey('cart.id'), nullable=False)
     product_id = Column(ForeignKey('product.id'), nullable=False)
     quantity = Column(Integer, nullable=False, server_default=FetchedValue())
-    price = Column(Integer, nullable=False, server_default=FetchedValue())
     created_at = Column(DateTime, nullable=False, server_default=FetchedValue())
     updated_at = Column(DateTime, nullable=False, server_default=FetchedValue())
     is_deleted = Column(Boolean, nullable=False, server_default=FetchedValue())
@@ -103,8 +112,52 @@ class Category(Base):
 
 
 
+class Commentproduct(Base):
+    __tablename__ = 'commentproduct'
+
+    id = Column(Integer, primary_key=True, server_default=FetchedValue())
+    content = Column(String, nullable=False)
+    stock_id = Column(ForeignKey('stock.id'), nullable=False)
+    user_id = Column(ForeignKey('User.id'), nullable=False)
+    product_id = Column(ForeignKey('product.id'), nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=FetchedValue())
+    updated_at = Column(DateTime, nullable=False, server_default=FetchedValue())
+    is_deleted = Column(Boolean, nullable=False, server_default=FetchedValue())
+
+    product = relationship('Product', primaryjoin='Commentproduct.product_id == Product.id', backref='commentproducts')
+    stock = relationship('Stock', primaryjoin='Commentproduct.stock_id == Stock.id', backref='commentproducts')
+    user = relationship('User', primaryjoin='Commentproduct.user_id == User.id', backref='commentproducts')
+
+
+
+class Guaranteeinfo(Base):
+    __tablename__ = 'guaranteeinfo'
+
+    id = Column(Integer, primary_key=True, server_default=FetchedValue())
+    transactionproduct_id = Column(ForeignKey('transactionproduct.id'), nullable=False)
+    content = Column(String, nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=FetchedValue())
+    updated_at = Column(DateTime, nullable=False, server_default=FetchedValue())
+    is_deleted = Column(Boolean, nullable=False, server_default=FetchedValue())
+
+    transactionproduct = relationship('Transactionproduct', primaryjoin='Guaranteeinfo.transactionproduct_id == Transactionproduct.id', backref='guaranteeinfos')
+
+
+
 class Place(Base):
     __tablename__ = 'place'
+
+    id = Column(Integer, primary_key=True, server_default=FetchedValue())
+    name = Column(String(60), nullable=False)
+    short_name = Column(String(60), nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=FetchedValue())
+    updated_at = Column(DateTime, nullable=False, server_default=FetchedValue())
+    is_deleted = Column(Boolean, nullable=False, server_default=FetchedValue())
+
+
+
+class Placemaster(Base):
+    __tablename__ = 'placemaster'
 
     id = Column(Integer, primary_key=True, server_default=FetchedValue())
     name = Column(String(60), nullable=False)
@@ -121,7 +174,6 @@ class Product(Base):
     id = Column(Integer, primary_key=True, server_default=FetchedValue())
     name = Column(String(60), nullable=False)
     price = Column(Integer, nullable=False, server_default=FetchedValue())
-    quantity = Column(Integer, nullable=False, server_default=FetchedValue())
     category_id = Column(ForeignKey('category.id'))
     image_url = Column(ARRAY(VARCHAR()), server_default=FetchedValue())
     slug = Column(String, unique=True)
@@ -129,9 +181,15 @@ class Product(Base):
     created_at = Column(DateTime, nullable=False, server_default=FetchedValue())
     updated_at = Column(DateTime, server_default=FetchedValue())
     is_deleted = Column(Boolean, nullable=False, server_default=FetchedValue())
+    brand_id = Column(ForeignKey('brand.id'), server_default=FetchedValue())
+    old_price = Column(Integer, server_default=FetchedValue())
 
+    brand = relationship('Brand', primaryjoin='Product.brand_id == Brand.id', backref='products')
     category = relationship('Category', primaryjoin='Product.category_id == Category.id', backref='products')
 
+    @hybrid_property
+    def down_price(self):
+        return (self.price - self.old_price) * 100 / self.old_price
 
 
 class Staff(Base):
@@ -186,17 +244,17 @@ class Transactionproduct(Base):
 
     id = Column(Integer, primary_key=True, server_default=FetchedValue())
     stock_id = Column(ForeignKey('stock.id'), nullable=False)
-    transationc_id = Column(ForeignKey('Transaction.id'), nullable=False)
+    transaction_id = Column(ForeignKey('Transaction.id'), nullable=False)
     product_id = Column(ForeignKey('product.id'), nullable=False)
     quantity = Column(Integer, nullable=False, server_default=FetchedValue())
-    price = Column(Integer, nullable=False, server_default=FetchedValue())
     created_at = Column(DateTime, nullable=False, server_default=FetchedValue())
     updated_at = Column(DateTime, nullable=False, server_default=FetchedValue())
     is_deleted = Column(Boolean, nullable=False, server_default=FetchedValue())
+    guarantee_time = Column(DateTime)
 
     product = relationship('Product', primaryjoin='Transactionproduct.product_id == Product.id', backref='transactionproducts')
     stock = relationship('Stock', primaryjoin='Transactionproduct.stock_id == Stock.id', backref='transactionproducts')
-    transationc = relationship('Transaction', primaryjoin='Transactionproduct.transationc_id == Transaction.id', backref='transactionproducts')
+    transaction = relationship('Transaction', primaryjoin='Transactionproduct.transaction_id == Transaction.id', backref='transactionproducts')
 
 
 
@@ -214,3 +272,18 @@ class Voucher(Base):
     discount = Column(Integer, server_default=FetchedValue())
     active = Column(Boolean, server_default=FetchedValue())
     code = Column(String, server_default=FetchedValue())
+
+
+
+class Voucherinuser(Base):
+    __tablename__ = 'voucherinuser'
+
+    id = Column(Integer, primary_key=True, server_default=FetchedValue())
+    user_id = Column(ForeignKey('User.id'))
+    voucher_id = Column(ForeignKey('voucher.id'))
+    created_at = Column(DateTime, nullable=False, server_default=FetchedValue())
+    updated_at = Column(DateTime, nullable=False, server_default=FetchedValue())
+    is_deleted = Column(Boolean, nullable=False, server_default=FetchedValue())
+
+    user = relationship('User', primaryjoin='Voucherinuser.user_id == User.id', backref='voucherinusers')
+    voucher = relationship('Voucher', primaryjoin='Voucherinuser.voucher_id == Voucher.id', backref='voucherinusers')

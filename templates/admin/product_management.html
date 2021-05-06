@@ -63,9 +63,9 @@
                             <tr>
                                 <th scope="col" class="sort" data-sort="name">Tên Sản Phẩm</th>
                                 <th scope="col" class="sort" data-sort="category_id">Category</th>
-                                <th scope="col" class="sort" data-sort="quantity">Số Lượng</th>
-                                <th scope="col" class="sort" data-sort="price">Giá</th>
-                                <th scope="col" class="sort" data-sort="slug">Slug</th>
+                                <th scope="col" class="sort" data-sort="brand_id">Thương Hiệu</th>
+                                <th scope="col" class="sort" data-sort="price">Giá Cũ</th>
+                                <th scope="col" class="sort" data-sort="price">Giá Mới</th>
                                 <th scope="col"></th>
                             </tr>
                             </thead>
@@ -75,29 +75,30 @@
                                     <th scope="row">
                                         <div class="media align-items-center">
                                             <div class="avatar-group">
-                                                {% for item in product.image_url %}
+                                                {% for item in product.Product.image_url %}
                                                     <a href="#" class="avatar avatar-sm rounded-circle">
                                                         <img alt="Image placeholder" src={{ item }}>
                                                     </a>
                                                 {% endfor %}
                                             </div>
                                             <div class="media-body">
-                                                <span class="name mb-0 text-sm">{{ product.name }}</span>
+                                                <span class="name mb-0 text-sm">{{ product.Product.name }}</span>
                                             </div>
                                         </div>
                                     </th>
                                     <td class="budget">
-                                        {{ product.category_id }}
+                                        {{ product.category_name }}
                                     </td>
                                     <td class="budget">
-                                        {{ product.quantity }}
+                                        {{ product.brand_name }}
                                     </td>
                                     <td class="budget">
-                                        {{ product.price }}
+                                        {{ product.Product.old_price | priceFormat }} VNĐ
                                     </td>
                                     <td class="budget">
-                                        {{ product.slug }}
+                                       <strong>{{ product.Product.price | priceFormat }} VNĐ</strong>
                                     </td>
+
                                     <td class="text-center">
                                         <div class="dropdown">
                                             <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
@@ -106,8 +107,8 @@
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
                                                 <a class="dropdown-item"
-                                                   href="{{ url_for('product_management.product_detail', id_product = product.id) }}">Sửa</a>
-                                                <a class="dropdown-item" id="{{ product.id }}"
+                                                   href="{{ url_for('product_management.product_detail', id_product = product.Product.id) }}">Sửa</a>
+                                                <a class="dropdown-item" id="{{ product.Product.id }}"
                                                    onclick="deleteProduct(this)">Xóa</a>
                                             </div>
                                         </div>

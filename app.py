@@ -9,13 +9,21 @@ from flask import Flask, session, current_app, g
 from flask_sqlalchemy import SQLAlchemy
 from libs.sql_action import db
 from controllers.admin import admin, product_management, user_management, category_management, \
-    staff_management, authentication_admin, place_management, voucher_management, stock_management, cart_management
-from controllers.client import main, product, cart, authentication_client
+    staff_management, authentication_admin, place_management, voucher_management, stock_management, cart_management, \
+    brand_management, order_management, guarantee_management
+from controllers.client import main, product, cart, authentication_client, order
 from libs.constant import none_to_empty_string
-from models import Place, Category
+from models import Place, Category, Cart, Brand, Placemaster, Voucher, Voucherinuser
 from libs.user_permission import user_required
 from service.cart import get_cart_by_cart_id_and_user_id
+from libs.constant import UserTypeEnum
+from config import NO_BRAND_ID, SHIPPING_FEE
+from service.voucher import get_all_voucher
+from datetime import datetime
+
 import json
+
+
 # ----------------------------------------------------------------------------#
 # App Config.
 # ----------------------------------------------------------------------------#
@@ -32,6 +40,10 @@ def create_app():
     my_app.register_blueprint(product_management.mod)
     my_app.register_blueprint(staff_management.mod)
     my_app.register_blueprint(place_management.mod)
+    my_app.register_blueprint(order.mod)
+    my_app.register_blueprint(guarantee_management.mod)
+    my_app.register_blueprint(order_management.mod)
+    my_app.register_blueprint(brand_management.mod)
     my_app.register_blueprint(cart_management.mod)
     my_app.register_blueprint(voucher_management.mod)
     my_app.register_blueprint(stock_management.mod)
@@ -55,22 +67,59 @@ def get_location_data():
     if g.places and len(g.places) > 0 and not session.get('place_id', None):
         session['place_id'] = g.places[0].id
 
+
 @app.before_request
 def get_cart_product_data():
-    list_cart = get_cart_by_cart_id_and_user_id(1,1,session['place_id'])
-    g.carts = list_cart
-    current_app.logger.info(list_cart)
+    if session.get('user_id', None):
+        cart = db.session.query(Cart).filter(Cart.user_id == session['user_id']).first()
+        if cart:
+            list_cart = get_cart_by_cart_id_and_user_id(
+                cart_id=cart.id,
+                user_id=session['user_id'],
+            )
+            g.carts = list_cart
+    else:
+        g.carts = []
+
 
 @app.before_request
 def get_category():
     list_category = db.session.query(Category).filter(Category.is_deleted.is_(False)).all()
     g.categories = list_category
 
+@app.before_request
+def get_list_place():
+    list_place = db.session.query(Placemaster).filter(Placemaster.is_deleted.is_(False)).all()
+    g.list_place = list_place
+
+
+@app.before_request
+def get_brand():
+    list_brand = db.session.query(Brand).filter(Brand.is_deleted.is_(False), Brand.id != NO_BRAND_ID).all()
+    g.brands = list_brand
+
+@app.before_request
+def get_voucher_user():
+    list_voucher_user = []
+    list_voucher_all_user = get_all_voucher(type="all_user", limit=3)
+    if session['user_id']:
+        list_voucher_user = db.session.query(Voucher).join(
+            Voucherinuser, Voucherinuser.voucher_id == Voucher.id
+        ).filter(
+            Voucherinuser.is_deleted.is_(False),
+            Voucherinuser.user_id == session['user_id'],
+            Voucher.begin_date <= datetime.now(),
+            Voucher.end_date >= datetime.now(),
+        ).all()
+    g.shipping_fee = SHIPPING_FEE
+    g.voucher_users = list_voucher_user + list_voucher_all_user
+
 @app.after_request
 def finish_request(response):
     """Close transaction after request"""
     db.session.close()
     return response
+
 
 @app.template_filter()
 def priceFormat(value):
@@ -94,10 +143,3 @@ if not app.debug:
 # Default port:
 if __name__ == '__main__':
     app.run(debug=True)
-
-# Or specify port manually:
-'''
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
-'''

@@ -1,13 +1,15 @@
-from flask import Blueprint, render_template, session, redirect, url_for, request
+from flask import Blueprint, render_template, session, redirect, url_for, request, current_app
 from models import Category, User, Voucher
 from flask_sqlalchemy import SQLAlchemy
 from libs.user_permission import user_required
 import json
 from libs.upload import uploads_banner_image
-from werkzeug.security import generate_password_hash ,check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from config import USER_FOLDER
 from service.voucher import get_all_voucher
-from  libs.upload import random_pwd
+from libs.upload import random_pwd
+from controllers.client.product import get_product_by_desc_created_at
+
 db = SQLAlchemy()
 mod = Blueprint(name='main', import_name="__name__", url_prefix='/', static_folder='static/client/assets',
                 template_folder='templates/client')
@@ -26,7 +28,7 @@ def update_user(form, id_user, file):
     fullname = form['fullname']
     phone_number = form['phone_number']
     address = form['address']
-
+    place_id = form['place_id']
     if id_user:
         user = db.session.query(User).filter_by(id=int(id_user)).first()
         user.username = username
@@ -34,6 +36,7 @@ def update_user(form, id_user, file):
         user.fullname = fullname
         user.phone_number = phone_number
         user.address = address
+        user.place_id = place_id
         db.session.merge(user)
     db.session.commit()
     if len(file) > 0:
@@ -45,10 +48,13 @@ def update_user(form, id_user, file):
 
 @mod.route('/')
 def main():
-    category = db.session.query(Category).all()
     list_voucher = get_all_voucher(type="all_user", limit=3)
-
-    return render_template('client.html', category=category, vouchers=list_voucher)
+    list_newest_products = get_product_by_desc_created_at(30)
+    newest_product = {}
+    if list_newest_products:
+        newest_product = list_newest_products[0]
+    return render_template('client.html', vouchers=list_voucher, newest_products=list_newest_products,
+                           newest_product=newest_product)
 
 
 @mod.route('/change-location/<id_location>')
@@ -57,6 +63,7 @@ def change_location(id_location):
         session['place_id'] = int(id_location)
     return 'Done'
 
+
 @mod.route('/profile', methods=['GET', 'POST'])
 @user_required
 def profile():
@@ -64,6 +71,7 @@ def profile():
     if not user_id:
         return redirect(url_for('main.main'))
     user = db.session.query(User).filter(User.id == user_id).first()
+
     if user:
         if request.method == 'POST':
             data = request.form

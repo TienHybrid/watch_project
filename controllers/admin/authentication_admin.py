@@ -94,7 +94,13 @@ def logout():
 @mod.route('/profile')
 @admin_required
 def profile():
-    return render_template('profile.html', current_user={})
+    admin_id = session.get('admin_id')
+    if admin_id:
+        current_user = db.session.query(Staff).filter(
+            Staff.is_deleted.is_(False),
+            Staff.id == admin_id
+        ).first()
+    return render_template('profile_admin.html', current_user=current_user)
 
 
 @mod.errorhandler(403)

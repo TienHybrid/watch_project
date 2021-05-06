@@ -9,6 +9,10 @@
             height: 100%;
             object-fit: cover !important;
         }
+
+        .hiddenRow {
+            padding: 0 !important;
+        }
     </style>
     <div class="header bg-primary pb-6">
         <div class="container-fluid">
@@ -25,11 +29,7 @@
                             </ol>
                         </nav>
                     </div>
-                    <div class="col-lg-6 col-5 text-right">
-                        <a href="{{ url_for('cart_management.cart_detail', id_cart = 'add') }}"
-                           class="btn btn-sm btn-neutral">New</a>
-                        <a href="#" class="btn btn-sm btn-neutral">Filters</a>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -42,77 +42,145 @@
                 <div class="card">
                     <!-- Card header -->
                     <div class="card-header bcart-0">
-                        <h3 class="mb-0">Đơn Hàng</h3>
+                        <h3 class="mb-0">Giỏ Hàng</h3>
                     </div>
                     <!-- Light table -->
                     <div class="table-responsive">
                         <table class="table align-items-center table-flush">
                             <thead class="thead-light">
                             <tr>
-                               <th scope="col" class="sort" data-sort="username">Tài Khoản</th>
-                            <th scope="col" class="sort" data-sort="fullname">Họ Tên</th>
-                            <th scope="col"></th>
+                                <th scope="col" class="sort" data-sort="username">Tài Khoản</th>
+                                <th scope="col" class="sort" data-sort="fullname">Họ Tên</th>
+                                <th scope="col"></th>
                             </tr>
                             </thead>
 
                             <tbody>
                             {% for cart in carts %}
-                            <tr data-toggle="collapse" data-target="#demo1" class="accordion-toggle">
-                                <th scope="row">
-                                <div class="media align-items-center">
-                                    <a href="#" class="avatar rounded-circle mr-3">
-                                        <img alt="Image placeholder" src="{{cart.avatar_url}}">
-                                    </a>
-                                    <div class="media-body">
-                                        <span class="name mb-0 text-sm">{{cart.username}}</span>
-                                    </div>
-                                </div>
-                            </th>
-                                <td>{{cart.fullname}}</td>
-                            </tr>
+                                <tr data-toggle="collapse" data-target="#demo-{{ cart.id }}" class="accordion-toggle">
+                                    <th scope="row">
+                                        <div class="media align-items-center">
+                                            <a href="#" class="avatar rounded-circle mr-3">
+                                                <img alt="Image placeholder" src="{{ cart.avatar_url }}">
+                                            </a>
+                                            <div class="media-body">
+                                                <span class="name mb-0 text-sm">{{ cart.username }}</span>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <td>{{ cart.fullname }}</td>
+                                </tr>
                                 {% if cart.carts %}
+                                    <tr>
+                                        <td colspan="12" class="hiddenRow">
+                                            <div class="accordian-body collapse" id="demo-{{ cart.id }}">
+                                                <table class="table table-striped">
+                                                    <thead>
+                                                    <tr class="info">
+                                                        <th>Kho</th>
+                                                        <th>Tên Sản Phẩm</th>
+                                                        <th>Giá</th>
+                                                        <th>Số Lượng</th>
+                                                        <th>Tổng Tiền</th>
+                                                        <th></th>
+                                                    </tr>
+                                                    </thead>
 
-                            <tr>
-                                <td colspan="12" class="hiddenRow">
-                                    <div class="accordian-body collapse" id="demo1">
-                                        <table class="table table-striped">
-                                            <thead>
-                                            <tr class="info">
-                                                <th>Kho</th>
-                                                <th>Tên Sản Phẩm</th>
-                                                <th>Giá</th>
-                                                <th>Số Lượng</th>
-                                                <th>Tổng Tiền</th>
-                                                <th></th>
-                                            </tr>
-                                            </thead>
+                                                    <tbody>
+                                                    {% for cart_item in cart.carts %}
+                                                        <tr data-toggle="collapse" class="accordion-toggle"
+                                                            data-target="#demo10">
+                                                            <td>{{ cart_item.stock_name }}</td>
+                                                            <td>{{ cart_item.product_name }}</td>
+                                                            <td>{{ cart_item.product_price |priceFormat }}</td>
+                                                            <td>{{ cart_item.quantity }}</td>
+                                                            <td>{{ (cart_item.product_price|int * cart_item.quantity |int) | priceFormat }}</td>
+                                                            <td class="text-center">
+                                                                <div class="dropdown">
+                                                                    <a class="btn btn-sm btn-icon-only text-light"
+                                                                       href="#" role="button"
+                                                                       data-toggle="dropdown" aria-haspopup="true"
+                                                                       aria-expanded="false">
+                                                                        <i class="fas fa-ellipsis-v"></i>
+                                                                    </a>
+                                                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                                        <a class="dropdown-item"
+                                                                           id="{{ cart_item.id }}"
+                                                                           data-product="{{ cart_item.product_name }}"
+                                                                           data-quantity="{{ cart_item.quantity }}"
+                                                                           onclick="editCartProduct(this)"
+                                                                           data-toggle="modal"
+                                                                           data-target="#modal-edit">Sửa</a>
+                                                                        <a class="dropdown-item" id="{{ cart_item.id }}"
+                                                                           onclick="deletecart(this)">Xóa</a>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
 
-                                            <tbody>
-                                            {% for cart_item in cart.carts %}
-                                            <tr data-toggle="collapse" class="accordion-toggle" data-target="#demo10">
-                                                <td>{{ cart_item.stock_name }}</td>
-                                                <td>{{ cart_item.product_name }}</td>
-                                                <td>{{ cart_item.product_price |priceFormat }}</td>
-                                                <td>{{ cart_item.quantity }}</td>
-                                                <td>{{ (cart_item.product_price|int * cart_item.quantity |int) | priceFormat }}</td>
-                                                <td>
-                                                    <a href="#" class="btn btn-default btn-sm">
-                                                        <i class="glyphicon glyphicon-cog"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-                                            </tbody>
-                                        </table>
-
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
                             {% endfor %}
                             </tbody>
 
                         </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-8">
+            <div aria-hidden="true" aria-labelledby="modal-edit" class="modal fade" id="modal-edit" role="dialog"
+                 tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+                    <div class="modal-content ">
+                        <div class="modal-body p-0">
+                            <div class="card bg-secondary shadow border-0">
+                                <div class="card-header bg-transparent pb-5">
+                                    <div class="text-muted text-center mt-2 mb-3"><small>Sửa Sản Phẩm</small>
+                                    </div>
+                                </div>
+                                <div class="card-body px-lg-5 py-lg-5">
+                                    <form enctype="multipart/form-data" method="post"
+                                          onsubmit="return submitFormEditData()">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <label for="input-product">Sản Phẩm</label>
+                                                    <div id="product_name"></div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <label class="form-control-label" for="input-quantity">Số
+                                                        Lượng</label>
+                                                    <input class="form-control" id="product_quantity"
+                                                           placeholder="Số Lượng"
+                                                           type="text" required
+                                                    >
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-center">
+                                            <a class="btn btn-sm "
+                                               class="close" data-dismiss="modal"
+                                            >Hủy Bỏ</a>
+                                            <button class="btn btn-sm btn-primary" type="submit">Save</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -131,7 +199,7 @@
                         if (willDelete) {
                             $.ajax({
                                 type: "POST",
-                                url: "/admin/cart_management/delete/" + idcart,
+                                url: "/admin/cart_management/delete_cart/" + idcart,
                                 success: function (data) {
                                     swal(data, {
                                         icon: "success",
@@ -147,6 +215,68 @@
                         }
                     });
             }
+
+            function editCartProduct(att) {
+                const product_name = att.getAttribute("data-product")
+                const product_quantity = att.getAttribute("data-quantity")
+                product = {
+                    product_id: att.id,
+                    quantity: product_quantity
+                }
+                const input_product_name = document.getElementById("product_name")
+                const input_product_quantity = document.getElementById("product_quantity")
+                input_product_name.innerHTML = `<span class="badge badge-default" id="product_name">${product_name}</span>`
+                input_product_quantity.value = product_quantity
+            }
+
+            function submitFormEditData() {
+                swal({
+                    title: "Are you sure?",
+                    text: "Kiểm Tra Thông Tin Trước khi gửi",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            var formData = new FormData();
+                            const input_product_quantity = document.getElementById("product_quantity").value
+                            if (product) {
+                                formData.append("product_id", product.product_id);
+                                formData.append("quantity", input_product_quantity);
+                            }
+                            let cart_product_id = parseInt($(element).find('.pid').val())
+                            let stock_id = parseInt($(element).find('.stock_id').val())
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{{url_for('cart_management.update_cart')}}",
+                                data: json.stringify(formData) ,
+                                contentType: false,
+                                processData: false,
+                                success: function (data) {
+                                    let objData = JSON.parse(data);
+                                    let idstock = parseInt(objData.id_stock);
+                                    if (idstock) {
+                                        window.location.reload();
+                                    } else {
+                                        swal(objData.message, {
+                                            icon: "warning",
+                                        });
+                                    }
+                                },
+                                error: function (e) {
+                                    document.innerHTML = e.responseText
+                                }
+                            });
+                            return false;
+                        } else {
+                            return false;
+                        }
+                    });
+                return false;
+            }
+
         </script>
 
 
